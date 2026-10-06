@@ -1,0 +1,15 @@
+{
+  "conductor": { "agent": "claude-code", "model": "opus" },
+  "workers": [
+    { "id": "w1", "agent": "claude-code", "model": "sonnet", "strengths": ["refactor", "feature", "multi-file"] },
+    { "id": "w2", "agent": "codex", "model": "", "strengths": ["bugfix", "tests"] },
+    { "id": "w3", "agent": "opencode", "model": "opencode/big-pickle", "strengths": ["docs", "small-edit", "boilerplate"] }
+  ],
+  "providers": {
+    "openrouter": { "apiKeyEnv": "OPENROUTER_API_KEY" }
+  },
+  "gates": ["npm test --silent"],
+  "budget": { "maxTokensPerTask": 60000, "maxRetries": 2 },
+  "limits": { "pauseAtPercent": 95, "resumeDelaySec": 60, "allowAccountFailover": false },
+  "memory": { "dir": ".orkestra/memory", "maxInjectTokens": 1200 }
+}

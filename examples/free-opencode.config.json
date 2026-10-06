@@ -1,0 +1,13 @@
+{
+  "conductor": { "agent": "opencode", "model": "opencode/big-pickle" },
+  "workers": [
+    { "id": "w1", "agent": "opencode", "model": "opencode/big-pickle", "strengths": ["refactor", "feature", "bugfix"] },
+    { "id": "w2", "agent": "opencode", "model": "opencode/nemotron-3-ultra-free", "strengths": ["tests", "bugfix"] },
+    { "id": "w3", "agent": "opencode", "model": "opencode/mimo-v2.6-flash-free", "strengths": ["docs", "small-edit"] }
+  ],
+  "providers": {},
+  "gates": ["node --test"],
+  "budget": { "maxTokensPerTask": 60000, "maxRetries": 2 },
+  "limits": { "pauseAtPercent": 95, "resumeDelaySec": 60, "allowAccountFailover": false },
+  "memory": { "dir": ".orkestra/memory", "maxInjectTokens": 800 }
+}

@@ -1,0 +1,16 @@
+name: Özellik önerisi
+description: Yeni bir ajan, sağlayıcı ya da özellik öner
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Hangi sorunu çözüyor?"
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: "Önerin"
+    validations:
+      required: true

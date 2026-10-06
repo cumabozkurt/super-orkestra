@@ -1,0 +1,50 @@
+{
+  "name": "super-orkestra-core",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^1.7.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.5",
+    "@vscode/tree-sitter-wasm": "^0.3.1"
+  },
+  "description": "Super Orkestra çekirdeği: şef/işçi yönlendirme, ACP/CLI işçileri, kalıcı hafıza, limit takibi, MCP sunucusu.",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cumabozkurt/super-orkestra.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestrator",
+    "mcp",
+    "acp",
+    "claude-code",
+    "codex",
+    "gemini",
+    "opencode"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Cuma Bozkurt",
+  "homepage": "https://github.com/cumabozkurt/super-orkestra#readme",
+  "bugs": {
+    "url": "https://github.com/cumabozkurt/super-orkestra/issues"
+  }
+}

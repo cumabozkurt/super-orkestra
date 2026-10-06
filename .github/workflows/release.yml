@@ -1,0 +1,81 @@
+name: release
+# vX.Y.Z etiketi itildiğinde:
+#  1) testler + npm yayını (super-orkestra-core, super-orkestra)   — sır: NPM_TOKEN (yoksa atlanır)
+#  2) VS Code .vsix (+ isteğe bağlı Marketplace / Open VSX)        — sırlar: VSCE_PAT, OVSX_PAT (yoksa atlanır)
+#  3) Masaüstü: Windows (.msi/.exe), macOS (Apple Silicon + Intel .dmg), Linux (.AppImage/.deb/.rpm)
+#  4) Hepsi tek bir taslak GitHub Release'te toplanır.
+on:
+  push: { tags: ["v*"] }
+  workflow_dispatch:
+permissions: { contents: write, id-token: write }
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  VSCE_PAT: ${{ secrets.VSCE_PAT }}
+  OVSX_PAT: ${{ secrets.OVSX_PAT }}
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
+      - run: git config --global user.email ci@example.com && git config --global user.name ci
+      - run: npm ci --ignore-scripts && npm run build && npm test
+      - name: Etiket ile package.json sürümü aynı mı?
+        if: startsWith(github.ref, 'refs/tags/')
+        run: test "v$(node -p "require('./packages/cli/package.json').version")" = "${GITHUB_REF_NAME}"
+      - name: npm yayını
+        if: env.NPM_TOKEN != '' && startsWith(github.ref, 'refs/tags/')
+        env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }
+        run: |
+          npm publish -w super-orkestra-core --provenance --access public
+          npm publish -w super-orkestra --provenance --access public
+      - run: npm run package:vscode
+      - name: VS Code Marketplace
+        if: env.VSCE_PAT != '' && startsWith(github.ref, 'refs/tags/')
+        run: npx @vscode/vsce publish --packagePath packages/vscode/*.vsix
+      - name: Open VSX
+        if: env.OVSX_PAT != '' && startsWith(github.ref, 'refs/tags/')
+        run: npx ovsx publish packages/vscode/*.vsix -p "$OVSX_PAT"
+      - uses: actions/upload-artifact@v4
+        with: { name: vsix, path: packages/vscode/*.vsix }
+
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: macos-latest, args: "--target aarch64-apple-darwin" }
+          - { platform: macos-latest, args: "--target x86_64-apple-darwin" }
+          - { platform: ubuntu-22.04, args: "" }
+          - { platform: windows-latest, args: "" }
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 24, cache: npm }
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}" }
+      - uses: swatinem/rust-cache@v2
+        with: { workspaces: "packages/desktop/src-tauri -> target" }
+      - if: matrix.platform == 'ubuntu-22.04'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - run: npm ci --ignore-scripts
+      - uses: tauri-apps/tauri-action@v0
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        with:
+          projectPath: packages/desktop
+          tagName: ${{ github.ref_name }}
+          releaseName: "Super Orkestra ${{ github.ref_name }}"
+          releaseBody: "Kurulum ve değişiklikler için README ve CHANGELOG'a bakın."
+          releaseDraft: true
+          args: ${{ matrix.args }}
+
+  attach:
+    needs: [publish, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: vsix }
+      - run: gh release upload "${GITHUB_REF_NAME}" *.vsix --clobber --repo "${GITHUB_REPOSITORY}"
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }

@@ -1,0 +1,24 @@
+# bağımlılıklar ve derleme çıktıları
+node_modules/
+dist/
+target/
+*.tsbuildinfo
+*.vsix
+*.tgz
+packages/desktop/src-tauri/gen/schemas/
+
+# Super Orkestra çalışma verisi (proje başına)
+.orkestra/
+orkestra.config.json
+
+# ortam / editör / işletim sistemi
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+coverage/

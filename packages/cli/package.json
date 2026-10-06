@@ -1,0 +1,52 @@
+{
+  "name": "super-orkestra",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "super-orkestra": "dist/index.js",
+    "orkestra": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "super-orkestra-core": "1.0.0"
+  },
+  "description": "Super Orkestra CLI: en güçlü model şef, altında 3 işçi model; en az token ve limitle en kaliteli kod.",
+  "files": [
+    "dist",
+    "hooks",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cumabozkurt/super-orkestra.git",
+    "directory": "packages/cli"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestrator",
+    "cli",
+    "mcp",
+    "claude-code",
+    "codex",
+    "gemini",
+    "opencode",
+    "openrouter"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "Cuma Bozkurt",
+  "homepage": "https://github.com/cumabozkurt/super-orkestra#readme",
+  "bugs": {
+    "url": "https://github.com/cumabozkurt/super-orkestra/issues"
+  }
+}

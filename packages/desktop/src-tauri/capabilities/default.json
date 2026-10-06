@@ -1,0 +1,16 @@
+{
+  "identifier": "default", "windows": ["main"],
+  "permissions": [
+    "core:default", "dialog:allow-open",
+    { "identifier": "shell:allow-execute", "allow": [
+      { "name": "orkestra", "cmd": "orkestra", "args": [{ "validator": "^(limits|usage|models)$" }] },
+      { "name": "orkestra-input", "cmd": "orkestra", "args": [{ "validator": "^(run|recall|remember)$" }, "-"] },
+      { "name": "orkestra-win", "cmd": "cmd", "args": ["/d", "/c", "orkestra", { "validator": "^(limits|usage|models)$" }] },
+      { "name": "orkestra-win-input", "cmd": "cmd", "args": ["/d", "/c", "orkestra", { "validator": "^(run|recall|remember)$" }, "-"] }
+    ] },
+    { "identifier": "shell:allow-spawn", "allow": [
+      { "name": "orkestra-input", "cmd": "orkestra", "args": [{ "validator": "^(run|recall|remember)$" }, "-"] },
+      { "name": "orkestra-win-input", "cmd": "cmd", "args": ["/d", "/c", "orkestra", { "validator": "^(run|recall|remember)$" }, "-"] }
+    ] }
+  ]
+}

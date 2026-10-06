@@ -1,0 +1,97 @@
+{
+  "name": "super-orkestra-vscode",
+  "displayName": "Super Orkestra",
+  "publisher": "super-orkestra",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.140.0"
+  },
+  "main": "dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "orkestra.conductor",
+        "name": "orkestra",
+        "fullName": "Super Orkestra Şef",
+        "description": "İşi en uygun modele dağıtır, testlerle denetler",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "limits",
+            "description": "Abonelik limitleri"
+          },
+          {
+            "name": "usage",
+            "description": "Token kullanımı"
+          },
+          {
+            "name": "recall",
+            "description": "Proje hafızasında ara"
+          }
+        ]
+      }
+    ],
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "orkestra.mcp",
+        "label": "Super Orkestra"
+      }
+    ],
+    "commands": [
+      {
+        "command": "orkestra.limits",
+        "title": "Super Orkestra: Limit durumu"
+      },
+      {
+        "command": "orkestra.run",
+        "title": "Super Orkestra: Şefe iş ver"
+      }
+    ],
+    "configuration": {
+      "title": "Super Orkestra",
+      "properties": {
+        "orkestra.command": {
+          "type": "string",
+          "default": "orkestra",
+          "description": "Super Orkestra CLI komutu veya tam yolu (npm i -g super-orkestra)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "package": "vsce package --no-dependencies"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/vscode": "^1.140.0",
+    "@vscode/vsce": "^4.0.0"
+  },
+  "description": "Şef model + 3 işçi model: en az token ve limitle en kaliteli kod.",
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "keywords": [
+    "ai",
+    "agents",
+    "claude",
+    "codex",
+    "opencode",
+    "openrouter",
+    "mcp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cumabozkurt/super-orkestra.git",
+    "directory": "packages/vscode"
+  },
+  "icon": "icon.png",
+  "author": "Cuma Bozkurt",
+  "homepage": "https://github.com/cumabozkurt/super-orkestra#readme",
+  "bugs": {
+    "url": "https://github.com/cumabozkurt/super-orkestra/issues"
+  }
+}

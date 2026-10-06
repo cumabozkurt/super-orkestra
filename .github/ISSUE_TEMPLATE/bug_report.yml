@@ -1,0 +1,42 @@
+name: Hata bildirimi
+description: Bir şey beklendiği gibi çalışmıyor
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: "Ne oldu?"
+      description: "Beklenen ve gerçekleşen davranış"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: "Yeniden üretme adımları"
+      placeholder: |
+        1. super-orkestra run "..."
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Sürüm"
+      placeholder: "super-orkestra --version"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: "İşletim sistemi"
+      options: [Windows, macOS, Linux]
+  - type: textarea
+    id: config
+    attributes:
+      label: "orkestra.config.json (API anahtarlarını silin)"
+      render: json
+  - type: textarea
+    id: logs
+    attributes:
+      label: "İlgili çıktı / .orkestra/usage.jsonl satırları"
+      render: shell

@@ -1,0 +1,15 @@
+:root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+body { margin: 0; }
+.app { max-width: 1000px; margin: auto; padding: 20px; }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+h1 { margin: 0; font-size: 22px; }
+nav button, button { padding: 6px 12px; border-radius: 8px; border: 1px solid #8884; background: transparent; cursor: pointer; }
+nav button.on { background: #5b5bd6; color: white; }
+textarea, input { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #8886; margin: 12px 0; font: inherit; }
+.log { background: #0001; padding: 12px; border-radius: 8px; min-height: 200px; white-space: pre-wrap; font-size: 13px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+.card { padding: 12px; border-radius: 10px; background: #5b5bd611; display: flex; flex-direction: column; }
+.card b { font-size: 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; } td, th { text-align: left; padding: 6px; border-bottom: 1px solid #8883; }
+.bar { height: 10px; background: #8883; border-radius: 6px; overflow: hidden; margin: 6px 0; } .bar div { height: 100%; background: #e5484d; }
+.dir code { margin-left: 8px; font-size: 12px; }
