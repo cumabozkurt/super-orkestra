@@ -151,7 +151,7 @@ describe("denetim düzeltmeleri", () => {
     const k2 = new Conductor(c, p, new Map([["w1", mk("w1")], ["w2", mk("w2")]]) as any, new Memory(join(d, ".orkestra/memory")), new LimitTracker(), sched, d); // limit sıfırlandı (yeni süreç)
     expect(await k2.runTask(job.brief, 0, [], { workerId: job.workerId, sessionId: job.sessionId, worktree: job.worktree })).toBe("done");
     const last = seen.at(-1); expect(last.id).toBe(job.workerId); expect(last.resume).toBe(job.sessionId); expect(last.cwd).toBe(job.worktree!.path);
-    expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("half\ndone\n");
+    expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("half\ndone\n");
   });
 });
 
@@ -190,7 +190,7 @@ describe("ikinci denetim düzeltmeleri", () => {
     const { applyDiff } = await import("../packages/core/src/workers/openrouter.js");
     const d = tmp("or-"); execSync("git init -q", { cwd: d }); writeFileSync(join(d, "f.txt"), "a\nb\n"); // printf/tek tırnak Windows cmd'de yok
     const r = applyDiff(d, "İşte:\n```diff\n--- a/f.txt\n+++ b/f.txt\n@@ -1,2 +1,2 @@\n a\n-b\n+c\n```\n");
-    expect(r.ok).toBe(true); expect(readFileSync(join(d, "f.txt"), "utf8")).toBe("a\nc\n");
+    expect(r.ok).toBe(true); expect(readFileSync(join(d, "f.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("a\nc\n");
     expect(applyDiff(d, "diff yok").ok).toBe(false);
   });
 });

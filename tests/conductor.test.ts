@@ -45,14 +45,14 @@ describe("şef döngüsü (sahte işçilerle)", () => {
     const c = cfg([`node -e "process.exit(require('fs').readFileSync('x.txt','utf8').includes('2')?0:1)"`]); const w = new FakeWorker(c.workers[0], write2);
     const { d, k } = setup(c, [w, new FakeWorker(c.workers[1], write2), new FakeWorker(c.workers[2], write2)], planner(["accept"]));
     expect(await k.runTask(brief)).toBe("done");
-    expect(w.calls[0].cwd).not.toBe(d); expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("2\n");
+    expect(w.calls[0].cwd).not.toBe(d); expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("2\n");
   });
   it("kapı kalırsa şef müdahale eder (fix) ve ikinci denemede düzelir", async () => {
     const c = cfg([`node -e "process.exit(require('fs').readFileSync('x.txt','utf8').includes('2')?0:1)"`]); const p = planner(["fix", "accept"]);
     const w = new FakeWorker(c.workers[0], (n, cwd) => (n === 1 ? {} : write2(n, cwd)));
     const { d, k } = setup(c, [w, new FakeWorker(c.workers[1], write2), new FakeWorker(c.workers[2], write2)], p);
     expect(await k.runTask(brief)).toBe("done"); expect(w.calls.length).toBe(2); expect(p.reviews).toBe(2);
-    expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("2\n");
+    expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("2\n");
   });
   it("limit gelen işçinin işi başka işçiye devredilir", async () => {
     const c = cfg([`node -e "process.exit(require('fs').readFileSync('x.txt','utf8').includes('2')?0:1)"`]);
@@ -82,7 +82,7 @@ describe("yarım işin korunması", () => {
     const carried: any[] = []; k.on("carry", e => carried.push(e));
     expect(await k.runTask(brief)).toBe("done");
     expect(seen).toBe("yarim\n"); expect(briefs[0].context).toContain("ÖNCEKİ DENEME YARIM KALDI"); expect(briefs[0].context).toContain("+yarim");
-    expect(carried[0]).toMatchObject({ to: "w2" }); expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("yarim\n2\n");
+    expect(carried[0]).toMatchObject({ to: "w2" }); expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("yarim\n2\n");
   });
   it("oturum kimliği dönmeyen limitte devam, yarım worktree'yi korur", async () => {
     const c = cfg([`node -e "process.exit(require('fs').readFileSync('x.txt','utf8').includes('tamam')?0:1)"`]);
@@ -96,7 +96,7 @@ describe("yarım işin korunması", () => {
     const lt = (k as any).limits as LimitTracker; (lt as any).hits?.clear?.();
     expect(await k.runTask(job.brief, 0, [], { workerId: job.workerId, sessionId: job.sessionId, worktree: job.worktree })).toBe("done");
     expect(w.calls[1].cwd).toBe(w.calls[0].cwd); expect(w.calls[1].resume).toBeUndefined();
-    expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("yarim\ntamam\n");
+    expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("yarim\ntamam\n");
   });
   it("worktree kaldırılınca boş kök klasör de silinir", async () => {
     const { createWorktree, removeWorktree } = await import("../packages/core/src/workers/worktree.js");

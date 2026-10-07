@@ -54,7 +54,7 @@ describe("şef: reassign", () => {
     const sched = new ResumeScheduler(async () => {});
     const k = new Conductor(c, p, new Map([["w1", w]]), new Memory(join(d, ".orkestra/memory")), new LimitTracker(), sched, d);
     expect(await k.runTask(brief)).toBe("done"); expect(n).toBe(2); expect(sched.pending().length).toBe(0);
-    expect(readFileSync(join(d, "x.txt"), "utf8")).toBe("2\n");
+    expect(readFileSync(join(d, "x.txt"), "utf8").replace(/\r\n/g, "\n")).toBe("2\n");
   });
 });
 

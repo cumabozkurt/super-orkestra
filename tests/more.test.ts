@@ -118,6 +118,13 @@ describe("dördüncü denetim", () => {
     process.env.ORKESTRA_GATE_TIMEOUT_MS = "500";
     const r = await runGates([`node -e "setTimeout(()=>{},60000)"`], tmpdir()); delete process.env.ORKESTRA_GATE_TIMEOUT_MS;
     expect(r.ok).toBe(false); expect(r.log).toContain("zaman aşımı");
-    expect((await runGates([`node -e "process.exit(process.env.CI==='1'?0:1)"`], tmpdir())).ok).toBe(true);
+    // GitHub Actions zaten CI=true ayarlar; varsayılanı (CI=1) sınamak için geçici olarak kaldır.
+    const prevCI = process.env.CI; delete process.env.CI;
+    try { expect((await runGates([`node -e "process.exit(process.env.CI==='1'?0:1)"`], tmpdir())).ok).toBe(true); }
+    finally { if (prevCI !== undefined) process.env.CI = prevCI; }
+    // Önceden ayarlanmış CI değeri korunur.
+    process.env.CI = "true";
+    try { expect((await runGates([`node -e "process.exit(process.env.CI==='true'?0:1)"`], tmpdir())).ok).toBe(true); }
+    finally { if (prevCI !== undefined) process.env.CI = prevCI; else delete process.env.CI; }
   });
 });
