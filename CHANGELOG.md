@@ -4,8 +4,18 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-10-08
+İlk kayıt defteri yayını: CLI ve çekirdek npm'de, eklenti VS Code Marketplace ve Open VSX'te.
+
+### Eklendi
+- npm: [`super-orkestra`](https://www.npmjs.com/package/super-orkestra) ve [`super-orkestra-core`](https://www.npmjs.com/package/super-orkestra-core) (provenance ile). Kurulum artık `npm i -g super-orkestra`.
+- VS Code eklentisi [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) ve [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode)'te.
+- README'lere npm, Marketplace ve Open VSX rozetleri.
+
 ### Değişti
 - VS Code eklentisinin yayıncısı `cumabozkurt` oldu; eklenti kimliği artık `cumabozkurt.super-orkestra-vscode` (Marketplace ve Open VSX).
+- README (EN/TR), `docs/` ve paket README'leri kurulumu npm / Marketplace / Open VSX üzerinden anlatıyor; GitHub sürümündeki tarball ve `.vsix` çevrimdışı seçenek olarak kaldı.
+- `release.yml`: npm'de, Marketplace'te ya da Open VSX'te zaten bulunan sürüm atlanıyor (`--skip-duplicate`, `npm view` denetimi), böylece yarıda kalan bir sürüm iş akışı güvenle yeniden çalıştırılabiliyor. Sürüm notlarına kayıt defteri bağlantıları eklendi.
 
 ## [1.0.0] — 2026-10-08
 İlk kararlı sürüm. Proje adı **Orkestra → Super Orkestra** oldu. İlk GitHub sürümü: [v1.0.0](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0).
@@ -58,5 +68,6 @@ limitte duraklayan iş artık **aynı işçi + aynı oturum + korunmuş yarım w
 ## [0.3.1] ve öncesi
 Claude Code / Codex / Gemini için kod düzeyinde ajan testleri, opencode ücretsiz modelleriyle gerçek uçtan uca koşu, MCP sunucusu, VS Code eklentisi, Tauri masaüstü, limit devri ve otomatik devam senaryoları (S3/S4).
 
-[Unreleased]: https://github.com/cumabozkurt/super-orkestra/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/cumabozkurt/super-orkestra/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/cumabozkurt/super-orkestra/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0

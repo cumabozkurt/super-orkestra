@@ -16,7 +16,7 @@ The selected project folder is remembered between sessions. If the CLI cannot be
 
 ## Download
 
-Installers for v1.0.0 are attached to the [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0):
+Installers are attached to every [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/latest):
 
 | OS | Files |
 |---|---|

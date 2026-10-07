@@ -53,7 +53,7 @@ jobs:
 
           ---
 
-          **Install / Kurulum:** the desktop installers, the VS Code `.vsix` and the CLI tarballs are attached below. How to install each one: [README → Downloads](https://github.com/cumabozkurt/super-orkestra#downloads-v100) · [Türkçe](https://github.com/cumabozkurt/super-orkestra/blob/main/README.tr.md#i̇ndirmeler-v100). `SHA256SUMS.txt` lists the checksum of every file.
+          **Install / Kurulum:** CLI `npm i -g super-orkestra` · VS Code [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) / [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode) (`cumabozkurt.super-orkestra-vscode`) · desktop installers, the `.vsix` and the CLI tarballs are attached below. Details: [README → Downloads](https://github.com/cumabozkurt/super-orkestra#downloads) · [Türkçe](https://github.com/cumabozkurt/super-orkestra/blob/main/README.tr.md#i̇ndirmeler). The desktop builds are not code-signed. `SHA256SUMS.txt` lists the checksum of every file.
           MD
           cat notes.md
       - name: Taslak GitHub Release
@@ -95,14 +95,20 @@ jobs:
         if: env.NPM_TOKEN != '' && startsWith(github.ref, 'refs/tags/v')
         env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }
         run: |
-          npm publish -w super-orkestra-core --provenance --access public
-          npm publish -w super-orkestra --provenance --access public
+          # core first (the CLI depends on its exact version); a version already on npm is skipped so re-runs are safe
+          pub() {
+            v=$(node -p "require('./packages/$2/package.json').version")
+            if npm view "$1@$v" version >/dev/null 2>&1; then echo "$1@$v is already on npm, skipping"; return; fi
+            npm publish -w "$1" --provenance --access public
+          }
+          pub super-orkestra-core core
+          pub super-orkestra cli
       - name: VS Code Marketplace (yalnızca VSCE_PAT varsa)
         if: env.VSCE_PAT != '' && startsWith(github.ref, 'refs/tags/v')
-        run: npx @vscode/vsce publish --packagePath packages/vscode/*.vsix
+        run: npx @vscode/vsce publish --skip-duplicate --packagePath packages/vscode/*.vsix
       - name: Open VSX (yalnızca OVSX_PAT varsa)
         if: env.OVSX_PAT != '' && startsWith(github.ref, 'refs/tags/v')
-        run: npx ovsx publish packages/vscode/*.vsix -p "$OVSX_PAT"
+        run: npx --yes ovsx publish packages/vscode/*.vsix --skip-duplicate -p "$OVSX_PAT"
       - uses: actions/upload-artifact@v6
         with: { name: packages, path: release-assets/*, if-no-files-found: error }
 

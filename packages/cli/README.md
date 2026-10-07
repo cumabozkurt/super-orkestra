@@ -8,12 +8,12 @@ Requires **Node.js ≥ 22.16**, git, and at least one logged-in agent CLI.
 
 ## Install
 
-The package is not on the npm registry yet. Install v1.0.0 from the [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0); the CLI needs the core tarball, so pass both in one command:
-
 ```bash
-npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
-         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
+npm i -g super-orkestra
+super-orkestra --version
 ```
+
+The VS Code extension is on the [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) and [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode); desktop installers are on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest).
 
 Or from source:
 

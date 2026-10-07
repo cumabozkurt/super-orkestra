@@ -13,11 +13,14 @@
 
 ## Install
 
-The extension is not on the Marketplace or Open VSX yet. Download `super-orkestra-vscode-1.0.0.vsix` from the [v1.0.0 release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0) and install it:
+The extension ID is `cumabozkurt.super-orkestra-vscode`.
 
-```bash
-code --install-extension super-orkestra-vscode-1.0.0.vsix
-```
+- **VS Code:** install it from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode), search *Super Orkestra* in the Extensions view, or run:
+  ```bash
+  code --install-extension cumabozkurt.super-orkestra-vscode
+  ```
+- **VSCodium, Cursor, Windsurf and other Open VSX editors:** install it from [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode).
+- **Offline:** every [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/latest) carries `super-orkestra-vscode-<version>.vsix`: `code --install-extension super-orkestra-vscode-<version>.vsix`, or Extensions view → `…` → **Install from VSIX…**.
 
 Or build the `.vsix` from source:
 

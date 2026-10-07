@@ -2,7 +2,7 @@
 
 | Page | What you will find |
 |---|---|
-| [Getting started](getting-started.md) | Install from the v1.0.0 release or from source, the first run, a free no-login trial, and what to expect on screen |
+| [Getting started](getting-started.md) | Install from npm or from source, the first run, a free no-login trial, and what to expect on screen |
 | [Configuration](configuration.md) | Every `orkestra.config.json` field, worker transports, gates, and environment variables |
 | [Architecture](architecture.md) | Conductor/worker loop, routing, review triggers, limits and resume, memory, repo map, on-disk layout |
 | [CLI reference](cli.md) | All `super-orkestra` commands with options and examples |

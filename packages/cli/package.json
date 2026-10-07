@@ -1,6 +1,6 @@
 {
   "name": "super-orkestra",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "bin": {
     "super-orkestra": "dist/index.js",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "commander": "^15.0.0",
-    "super-orkestra-core": "1.0.0"
+    "super-orkestra-core": "1.0.1"
   },
   "description": "Super Orkestra CLI: en güçlü model şef, altında 3 işçi model; en az token ve limitle en kaliteli kod.",
   "files": [

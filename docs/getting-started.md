@@ -3,7 +3,7 @@
 This guide takes you from zero to your first orchestrated change.
 
 > [!NOTE]
-> Super Orkestra **v1.0.0** is on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest). It is not on the npm registry yet, so step 2 installs the CLI from the release tarballs (or from source).
+> The CLI is on [npm](https://www.npmjs.com/package/super-orkestra), the VS Code extension on the [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) and [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode), and the desktop installers on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest).
 
 ## 1. Prerequisites
 
@@ -26,17 +26,18 @@ Run each CLI once interactively to log in.
 
 ## 2. Install Super Orkestra
 
-### From the v1.0.0 release (recommended)
-
-The CLI tarball depends on the core tarball, so pass **both URLs in one command**:
+### From npm (recommended)
 
 ```bash
-npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
-         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
-super-orkestra --version   # 1.0.0
+npm i -g super-orkestra    # also installs super-orkestra-core
+super-orkestra --version
 ```
 
-The release also has the VS Code extension (`.vsix`) and desktop installers. See [VS Code extension](vscode-extension.md) and [Desktop app](desktop-app.md).
+Upgrade later with `npm i -g super-orkestra@latest`. For the VS Code extension and the desktop app, see [VS Code extension](vscode-extension.md) and [Desktop app](desktop-app.md).
+
+### From a GitHub release (offline)
+
+Each [release](https://github.com/cumabozkurt/super-orkestra/releases/latest) also carries the two npm tarballs. The CLI tarball needs the core tarball, so install **both in one command**: `npm i -g ./super-orkestra-core-<version>.tgz ./super-orkestra-<version>.tgz`.
 
 ### From source
 

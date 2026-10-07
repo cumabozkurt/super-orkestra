@@ -10,6 +10,9 @@
 <p align="center">
   <a href="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml"><img src="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/cumabozkurt/super-orkestra/releases/latest"><img src="https://img.shields.io/github/v/release/cumabozkurt/super-orkestra?sort=semver&label=s%C3%BCr%C3%BCm" alt="Son sürüm"></a>
+  <a href="https://www.npmjs.com/package/super-orkestra"><img src="https://img.shields.io/npm/v/super-orkestra?logo=npm" alt="npm"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode"><img src="https://img.shields.io/visual-studio-marketplace/v/cumabozkurt.super-orkestra-vscode?label=VS%20Marketplace&logo=visualstudiocode" alt="VS Code Marketplace"></a>
+  <a href="https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode"><img src="https://img.shields.io/open-vsx/v/cumabozkurt/super-orkestra-vscode?label=Open%20VSX" alt="Open VSX"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/lisans-MIT-blue" alt="MIT lisansı"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A5%2022.16-339933?logo=node.js&logoColor=white" alt="Node.js ≥ 22.16">
   <img src="https://img.shields.io/badge/MCP-sunucu-6E56CF" alt="MCP sunucusu">
@@ -62,7 +65,7 @@ Ayrıntılar (yönlendirme formülü, denetim tetikleyicileri, devam karar tablo
 ## Hızlı başlangıç
 
 > [!NOTE]
-> **v1.0.0 [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest) üzerinde yayında:** CLI tarball'ları, VS Code `.vsix` dosyası ve Windows, macOS, Linux masaüstü kurulumları. Paketler henüz npm kayıt defterinde, VS Code Marketplace'te ya da Open VSX'te değil; aşağıdaki gibi sürümden kurun.
+> CLI **[npm](https://www.npmjs.com/package/super-orkestra)**'de, eklenti **[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode)** ve **[Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode)**'te, Windows, macOS ve Linux masaüstü kurulumları **[GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest)**'te.
 
 **Gereksinimler:** Node.js **≥ 22.16** (FTS5 içeren yerleşik `node:sqlite` gerekir), git ve giriş yapılmış en az bir ajan CLI'ı.
 
@@ -70,10 +73,9 @@ Ayrıntılar (yönlendirme formülü, denetim tetikleyicileri, devam karar tablo
 # 1) Kullanmak istediğin ajan CLI'ları (istediğin kadarı)
 npm i -g @anthropic-ai/claude-code @openai/codex @google/gemini-cli opencode-ai
 
-# 2) Super Orkestra CLI'ı v1.0.0 sürümünden kur (iki tarball TEK komutta)
-npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
-         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
-super-orkestra --version          # 1.0.0 — kısa adı `orkestra`
+# 2) Super Orkestra
+npm i -g super-orkestra
+super-orkestra --version          # kısa adı `orkestra`
 
 # 3) Projende (bir git deposu) çalıştır
 cd ~/kod/projem
@@ -90,17 +92,17 @@ npm link -w super-orkestra        # `super-orkestra` ve `orkestra` komutlarını
 ```
 </details>
 
-### İndirmeler (v1.0.0)
+### İndirmeler
 
-Hepsi **[son sürüme](https://github.com/cumabozkurt/super-orkestra/releases/latest)** ekli. `SHA256SUMS.txt` her dosyanın sağlama toplamını içerir.
-
-| Bileşen | Dosyalar | Kurulum |
+| Bileşen | Nerede | Kurulum |
 |---|---|---|
-| CLI + MCP sunucusu | `super-orkestra-core-1.0.0.tgz`, `super-orkestra-1.0.0.tgz` | yukarıdaki `npm i -g …` satırı (CLI, yanında core tarball'ını ister) |
-| VS Code eklentisi | `super-orkestra-vscode-1.0.0.vsix` | `code --install-extension super-orkestra-vscode-1.0.0.vsix` ya da Uzantılar → `…` → *Install from VSIX…* |
-| Masaüstü · Windows | `.msi`, `-setup.exe` | kurulumu çalıştır |
-| Masaüstü · macOS | `.dmg` (`aarch64` = Apple Silicon, `x64` = Intel) | `.dmg`'yi aç, uygulamayı Applications'a sürükle |
-| Masaüstü · Linux | `.AppImage`, `.deb`, `.rpm` | AppImage'a `chmod +x` ver ya da paketi kur |
+| CLI + MCP sunucusu | [npm: `super-orkestra`](https://www.npmjs.com/package/super-orkestra) ([`super-orkestra-core`](https://www.npmjs.com/package/super-orkestra-core) ile birlikte gelir) | `npm i -g super-orkestra` |
+| VS Code eklentisi | [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) · [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode) (VSCodium, Cursor, Windsurf…) | `code --install-extension cumabozkurt.super-orkestra-vscode` ya da Uzantılar görünümünde *Super Orkestra* ara |
+| Masaüstü · Windows | [GitHub sürümü](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.msi`, `-setup.exe` | kurulumu çalıştır |
+| Masaüstü · macOS | [GitHub sürümü](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.dmg` (`aarch64` = Apple Silicon, `x64` = Intel) | `.dmg`'yi aç, uygulamayı Applications'a sürükle |
+| Masaüstü · Linux | [GitHub sürümü](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.AppImage`, `.deb`, `.rpm` | AppImage'a `chmod +x` ver ya da paketi kur |
+
+Her sürümde ayrıca CLI tarball'ları, `.vsix` dosyası (çevrimdışı kurulum: `code --install-extension super-orkestra-vscode-<sürüm>.vsix`) ve her dosyanın sağlama toplamını içeren `SHA256SUMS.txt` bulunur.
 
 Masaüstü derlemeleri **kod imzalı değil**. Windows SmartScreen onay isteyebilir (*Ek bilgi → Yine de çalıştır*). macOS'ta ilk açılışta uygulamaya sağ tıklayıp *Aç* deyin ya da `xattr -dr com.apple.quarantine "/Applications/Super Orkestra.app"` çalıştırın. Masaüstü uygulaması ve VS Code eklentisi CLI'ı kullanır; önce CLI'ı kurun.
 
@@ -146,7 +148,7 @@ Tüm alanlar ve `ORKESTRA_*` ortam değişkenleri: [docs/configuration.md](docs/
 { "statusLine": { "type": "command", "command": "super-orkestra statusline" } }
 ```
 
-**VS Code:** `npm run package:vscode` ile `.vsix` üret → Uzantılar → "VSIX'ten yükle". Sohbette `@orkestra <görev>`, `/limits`, `/usage`, `/recall`. Ayrıntı: [docs/vscode-extension.md](docs/vscode-extension.md).
+**VS Code:** eklentiyi [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) ya da [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode)'ten kur (`cumabozkurt.super-orkestra-vscode`). Sohbette `@orkestra <görev>`, `/limits`, `/usage`, `/recall`. Ayrıntı: [docs/vscode-extension.md](docs/vscode-extension.md).
 
 **Masaüstü:** Geliştirme için `npm run dev:desktop` (Rust + Tauri önkoşulları gerekir). Uygulama CLI'ı çağırır, bu yüzden önce CLI kurulmalıdır. Ayrıntı: [docs/desktop-app.md](docs/desktop-app.md).
 

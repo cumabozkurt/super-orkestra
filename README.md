@@ -10,6 +10,9 @@
 <p align="center">
   <a href="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml"><img src="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/cumabozkurt/super-orkestra/releases/latest"><img src="https://img.shields.io/github/v/release/cumabozkurt/super-orkestra?sort=semver" alt="Latest release"></a>
+  <a href="https://www.npmjs.com/package/super-orkestra"><img src="https://img.shields.io/npm/v/super-orkestra?logo=npm" alt="npm"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode"><img src="https://img.shields.io/visual-studio-marketplace/v/cumabozkurt.super-orkestra-vscode?label=VS%20Marketplace&logo=visualstudiocode" alt="VS Code Marketplace"></a>
+  <a href="https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode"><img src="https://img.shields.io/open-vsx/v/cumabozkurt/super-orkestra-vscode?label=Open%20VSX" alt="Open VSX"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A5%2022.16-339933?logo=node.js&logoColor=white" alt="Node.js ≥ 22.16">
   <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict">
@@ -76,7 +79,7 @@ For the full picture (routing formula, review triggers, the resume decision tabl
 ## Quick start
 
 > [!NOTE]
-> **v1.0.0 is out on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest)** with the CLI tarballs, the VS Code `.vsix` and desktop installers for Windows, macOS and Linux. The packages are not on the npm registry, the VS Code Marketplace or Open VSX yet, so install them from the release as shown below.
+> The CLI is on **[npm](https://www.npmjs.com/package/super-orkestra)**, the extension on the **[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode)** and **[Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode)**, and the desktop installers for Windows, macOS and Linux on **[GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest)**.
 
 **Requirements:** Node.js **≥ 22.16** (needs the built-in `node:sqlite` with FTS5), git, and at least one agent CLI you are logged into.
 
@@ -84,10 +87,9 @@ For the full picture (routing formula, review triggers, the resume decision tabl
 # 1) The agent CLIs you want to use (any subset)
 npm i -g @anthropic-ai/claude-code @openai/codex @google/gemini-cli opencode-ai
 
-# 2) Super Orkestra CLI from the v1.0.0 release (both tarballs in ONE command)
-npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
-         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
-super-orkestra --version          # 1.0.0 — `orkestra` is the short alias
+# 2) Super Orkestra
+npm i -g super-orkestra
+super-orkestra --version          # `orkestra` is the short alias
 
 # 3) Run it in your project (a git repository)
 cd ~/code/my-project
@@ -104,17 +106,17 @@ npm link -w super-orkestra        # puts `super-orkestra` and `orkestra` on your
 ```
 </details>
 
-### Downloads (v1.0.0)
+### Downloads
 
-Everything is attached to the **[latest release](https://github.com/cumabozkurt/super-orkestra/releases/latest)**. `SHA256SUMS.txt` lists the checksum of every file.
-
-| Component | Files | Install |
+| Component | Where | Install |
 |---|---|---|
-| CLI + MCP server | `super-orkestra-core-1.0.0.tgz`, `super-orkestra-1.0.0.tgz` | the `npm i -g …` line above (the CLI needs the core tarball next to it) |
-| VS Code extension | `super-orkestra-vscode-1.0.0.vsix` | `code --install-extension super-orkestra-vscode-1.0.0.vsix`, or Extensions → `…` → *Install from VSIX…* |
-| Desktop app · Windows | `.msi`, `-setup.exe` | run the installer |
-| Desktop app · macOS | `.dmg` (`aarch64` = Apple Silicon, `x64` = Intel) | open the `.dmg` and drag the app to Applications |
-| Desktop app · Linux | `.AppImage`, `.deb`, `.rpm` | `chmod +x` the AppImage, or install the package |
+| CLI + MCP server | [npm: `super-orkestra`](https://www.npmjs.com/package/super-orkestra) (pulls in [`super-orkestra-core`](https://www.npmjs.com/package/super-orkestra-core)) | `npm i -g super-orkestra` |
+| VS Code extension | [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) · [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode) (VSCodium, Cursor, Windsurf…) | `code --install-extension cumabozkurt.super-orkestra-vscode`, or search *Super Orkestra* in the Extensions view |
+| Desktop app · Windows | [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.msi`, `-setup.exe` | run the installer |
+| Desktop app · macOS | [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.dmg` (`aarch64` = Apple Silicon, `x64` = Intel) | open the `.dmg` and drag the app to Applications |
+| Desktop app · Linux | [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/latest): `.AppImage`, `.deb`, `.rpm` | `chmod +x` the AppImage, or install the package |
+
+Every release also carries the CLI tarballs, the `.vsix` (for offline installs: `code --install-extension super-orkestra-vscode-<version>.vsix`) and `SHA256SUMS.txt` with the checksum of every file.
 
 The desktop builds are **not code-signed**. Windows SmartScreen may ask you to confirm (*More info → Run anyway*). On macOS, right-click the app → *Open* the first time, or run `xattr -dr com.apple.quarantine "/Applications/Super Orkestra.app"`. The desktop app and the VS Code extension both drive the CLI, so install the CLI first.
 
@@ -179,7 +181,7 @@ codex mcp add super-orkestra -- super-orkestra mcp
 { "statusLine": { "type": "command", "command": "super-orkestra statusline" } }
 ```
 
-**VS Code extension.** Adds the `@orkestra` chat participant (`/limits`, `/usage`, `/recall`), registers the MCP server automatically, and shows limits in the status bar. Build it with `npm run package:vscode` and install the `.vsix`. → [docs/vscode-extension.md](docs/vscode-extension.md)
+**VS Code extension.** Adds the `@orkestra` chat participant (`/limits`, `/usage`, `/recall`), registers the MCP server automatically, and shows limits in the status bar. Install it from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) or [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode) (`cumabozkurt.super-orkestra-vscode`). → [docs/vscode-extension.md](docs/vscode-extension.md)
 
 **Desktop app.** Tauri 2 + React 19, with tabs for Task, Usage, Limits, Memory and Models. It drives the CLI, so the CLI must be installed. → [docs/desktop-app.md](docs/desktop-app.md)
 
@@ -187,9 +189,9 @@ codex mcp add super-orkestra -- super-orkestra mcp
 
 | Package | Path | Description |
 |---|---|---|
-| [`super-orkestra`](packages/cli) | `packages/cli` | The CLI (`super-orkestra` / `orkestra`) and the Claude Code statusline hook |
-| [`super-orkestra-core`](packages/core) | `packages/core` | Conductor, router, workers (CLI / ACP / OpenRouter), worktrees, gates, memory, repo map, limits, MCP server |
-| [`super-orkestra-vscode`](packages/vscode) | `packages/vscode` | Thin VS Code extension: chat participant, MCP registration, status bar |
+| [`super-orkestra`](packages/cli) · [npm](https://www.npmjs.com/package/super-orkestra) | `packages/cli` | The CLI (`super-orkestra` / `orkestra`) and the Claude Code statusline hook |
+| [`super-orkestra-core`](packages/core) · [npm](https://www.npmjs.com/package/super-orkestra-core) | `packages/core` | Conductor, router, workers (CLI / ACP / OpenRouter), worktrees, gates, memory, repo map, limits, MCP server |
+| [`super-orkestra-vscode`](packages/vscode) · [Marketplace](https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode) · [Open VSX](https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode) | `packages/vscode` | Thin VS Code extension: chat participant, MCP registration, status bar |
 | [`super-orkestra-desktop`](packages/desktop) | `packages/desktop` | Tauri 2 + React desktop app (private, not published to npm) |
 
 ```
@@ -221,7 +223,8 @@ More answers: **[docs/faq.md](docs/faq.md)**.
 These are candidates, not promises. Discussion and PRs are welcome.
 
 - [x] First GitHub release ([v1.0.0](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0)): CLI tarballs, `.vsix`, desktop installers for Windows, macOS and Linux.
-- [ ] Publish to npm, the VS Code Marketplace / Open VSX, and ship code-signed desktop installers (`release.yml` already does this once the secrets are set).
+- [x] Published to npm, the VS Code Marketplace and Open VSX (v1.0.1).
+- [ ] Code-signed desktop installers (Windows Authenticode, Apple notarization).
 - [ ] Use the router's existing "ambiguous" signal to ask the conductor a one-line tie-break question.
 - [ ] Inject the other memory-bank files (`project.md`, `decisions.md`) within the token budget, not just `conventions.md`.
 - [ ] Run independent tasks of a plan in parallel (tasks currently run one after another).
