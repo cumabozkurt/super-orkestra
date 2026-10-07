@@ -14,6 +14,18 @@
 
 The selected project folder is remembered between sessions. If the CLI cannot be started, the app shows an install hint instead of hanging.
 
+## Download
+
+Installers for v1.0.0 are attached to the [GitHub release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0):
+
+| OS | Files |
+|---|---|
+| Windows (x64) | `.msi` and `-setup.exe` (NSIS) |
+| macOS | `.dmg`: `aarch64` for Apple Silicon, `x64` for Intel |
+| Linux (x64) | `.AppImage`, `.deb`, `.rpm` |
+
+The builds are **not code-signed**. On Windows, SmartScreen may ask you to confirm (*More info → Run anyway*). On macOS, right-click the app and choose *Open* the first time, or run `xattr -dr com.apple.quarantine "/Applications/Super Orkestra.app"`. Check downloads against `SHA256SUMS.txt` in the same release.
+
 ## Requirements
 
 - The Super Orkestra CLI installed so that the `orkestra` command is on `PATH` (see [Getting started](getting-started.md)).
@@ -39,7 +51,7 @@ Frontend-only changes can be checked quickly with `npm run build -w super-orkest
 npm run tauri build -w super-orkestra-desktop
 ```
 
-`bundle.targets` is `"all"`, so you get the native formats for the OS you build on: `.msi`/`.exe` on Windows, `.dmg`/`.app` on macOS, and `.AppImage`/`.deb`/`.rpm` on Linux. `release.yml` builds all of them (macOS for both Apple Silicon and Intel) into a **draft** GitHub Release when a `v*` tag is pushed. The builds are not code-signed.
+`bundle.targets` is `"all"`, so you get the native formats for the OS you build on: `.msi`/`.exe` on Windows, `.dmg`/`.app` on macOS, and `.AppImage`/`.deb`/`.rpm` on Linux. `release.yml` builds all of them (macOS for both Apple Silicon and Intel) into the GitHub Release when a `v*` tag is pushed: the workflow opens a draft, every platform uploads its installers, and the release is published once all of them (plus the `.vsix`, the CLI tarballs and `SHA256SUMS.txt`) are attached. The builds are not code-signed.
 
 ## Permission model
 

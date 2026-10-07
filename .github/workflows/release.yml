@@ -1,54 +1,122 @@
 name: release
 # vX.Y.Z etiketi itildiğinde:
-#  1) testler + npm yayını (super-orkestra-core, super-orkestra)   — sır: NPM_TOKEN (yoksa atlanır)
-#  2) VS Code .vsix (+ isteğe bağlı Marketplace / Open VSX)        — sırlar: VSCE_PAT, OVSX_PAT (yoksa atlanır)
-#  3) Masaüstü: Windows (.msi/.exe), macOS (Apple Silicon + Intel .dmg), Linux (.AppImage/.deb/.rpm)
-#  4) Hepsi tek bir taslak GitHub Release'te toplanır.
+#  1) prepare  — tüm sürüm alanları etiketle aynı mı? CHANGELOG'daki bölümden notlarla TASLAK GitHub Release
+#  2) packages — testler; npm tarball'ları (super-orkestra-core, super-orkestra) ve VS Code .vsix
+#                npm / VS Code Marketplace / Open VSX yalnızca ilgili sır tanımlıysa (NPM_TOKEN, VSCE_PAT, OVSX_PAT)
+#  3) desktop  — Tauri: Windows (.msi/.exe), macOS (Apple Silicon + Intel .dmg), Linux (.AppImage/.deb/.rpm) taslağa yüklenir
+#  4) publish  — paketler + SHA256SUMS.txt eklenir, taslak yayımlanır (Latest)
+# workflow_dispatch (etiketsiz): aynı derlemeler yalnızca iş yapıtı (artifact) olarak üretilir; hiçbir yere yayın yapılmaz.
 on:
   push: { tags: ["v*"] }
   workflow_dispatch:
 permissions: { contents: write, id-token: write }
+concurrency: { group: "release-${{ github.ref }}", cancel-in-progress: false }
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   VSCE_PAT: ${{ secrets.VSCE_PAT }}
   OVSX_PAT: ${{ secrets.OVSX_PAT }}
 jobs:
-  publish:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 24 }
+      - name: Sürüm alanları etiketle aynı mı?
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          node - <<'JS'
+          const fs = require('node:fs');
+          const want = process.env.GITHUB_REF_NAME.replace(/^v/, '');
+          const read = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
+          const found = {
+            'package.json': read('package.json').version,
+            'packages/core/package.json': read('packages/core/package.json').version,
+            'packages/cli/package.json': read('packages/cli/package.json').version,
+            'packages/cli → super-orkestra-core': read('packages/cli/package.json').dependencies['super-orkestra-core'],
+            'packages/vscode/package.json': read('packages/vscode/package.json').version,
+            'packages/desktop/package.json': read('packages/desktop/package.json').version,
+            'tauri.conf.json': read('packages/desktop/src-tauri/tauri.conf.json').version,
+            'Cargo.toml': (fs.readFileSync('packages/desktop/src-tauri/Cargo.toml', 'utf8').match(/^version\s*=\s*"([^"]+)"/m) || [])[1],
+          };
+          const bad = Object.entries(found).filter(([, v]) => v !== want);
+          for (const [f, v] of Object.entries(found)) console.log(`${v === want ? 'ok ' : 'BAD'} ${f}: ${v}`);
+          if (bad.length) { console.error(`::error::sürüm alanları ${want} değil`); process.exit(1); }
+          JS
+      - name: Sürüm notları (CHANGELOG.md)
+        run: |
+          v=$(node -p "require('./packages/cli/package.json').version")
+          node .github/scripts/changelog-section.mjs "$v" > notes.md
+          cat >> notes.md <<'MD'
+
+          ---
+
+          **Kurulum / Install:** see the README (*Install*): desktop installers, the VS Code `.vsix` and the CLI tarballs are attached below. `SHA256SUMS.txt` lists the checksum of every file.
+          MD
+          cat notes.md
+      - name: Taslak GitHub Release
+        id: release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env: { GH_TOKEN: "${{ github.token }}", TAG: "${{ github.ref_name }}" }
+        run: |
+          find_id() { gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name == \"$TAG\") | .id" | head -n1; }
+          id=$(find_id)
+          if [ -z "$id" ]; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+              --title "Super Orkestra $TAG" --notes-file notes.md
+            id=$(find_id)
+          fi
+          test -n "$id"
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  packages:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
-      - run: git config --global user.email ci@example.com && git config --global user.name ci
+      - run: git config --global user.email ci@example.com && git config --global user.name ci && git config --global init.defaultBranch main
       - run: npm ci --ignore-scripts && npm run build && npm test
-      - name: Etiket ile package.json sürümü aynı mı?
-        if: startsWith(github.ref, 'refs/tags/')
-        run: test "v$(node -p "require('./packages/cli/package.json').version")" = "${GITHUB_REF_NAME}"
-      - name: npm yayını
-        if: env.NPM_TOKEN != '' && startsWith(github.ref, 'refs/tags/')
+      - name: npm tarball'ları
+        run: |
+          mkdir -p release-assets
+          npm pack -w super-orkestra-core -w super-orkestra --pack-destination release-assets
+      - name: VS Code .vsix
+        run: npm run package:vscode && cp packages/vscode/*.vsix release-assets/
+      - name: Kurulum denemesi (tarball'lardan genel kurulum)
+        run: |
+          npm i -g --prefix "$RUNNER_TEMP/g" release-assets/super-orkestra-core-*.tgz release-assets/super-orkestra-[0-9]*.tgz
+          "$RUNNER_TEMP/g/bin/super-orkestra" --version
+          ls -l release-assets
+      - name: npm yayını (yalnızca NPM_TOKEN varsa)
+        if: env.NPM_TOKEN != '' && startsWith(github.ref, 'refs/tags/v')
         env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }
         run: |
           npm publish -w super-orkestra-core --provenance --access public
           npm publish -w super-orkestra --provenance --access public
-      - run: npm run package:vscode
-      - name: VS Code Marketplace
-        if: env.VSCE_PAT != '' && startsWith(github.ref, 'refs/tags/')
+      - name: VS Code Marketplace (yalnızca VSCE_PAT varsa)
+        if: env.VSCE_PAT != '' && startsWith(github.ref, 'refs/tags/v')
         run: npx @vscode/vsce publish --packagePath packages/vscode/*.vsix
-      - name: Open VSX
-        if: env.OVSX_PAT != '' && startsWith(github.ref, 'refs/tags/')
+      - name: Open VSX (yalnızca OVSX_PAT varsa)
+        if: env.OVSX_PAT != '' && startsWith(github.ref, 'refs/tags/v')
         run: npx ovsx publish packages/vscode/*.vsix -p "$OVSX_PAT"
       - uses: actions/upload-artifact@v6
-        with: { name: vsix, path: packages/vscode/*.vsix }
+        with: { name: packages, path: release-assets/*, if-no-files-found: error }
 
   desktop:
+    needs: prepare
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { platform: macos-latest, args: "--target aarch64-apple-darwin" }
-          - { platform: macos-latest, args: "--target x86_64-apple-darwin" }
-          - { platform: ubuntu-22.04, args: "" }
-          - { platform: windows-latest, args: "" }
+          - { platform: macos-latest, args: "--target aarch64-apple-darwin", name: macos-arm64 }
+          - { platform: macos-latest, args: "--target x86_64-apple-darwin", name: macos-x64 }
+          - { platform: ubuntu-22.04, args: "", name: linux-x64 }
+          - { platform: windows-latest, args: "", name: windows-x64 }
+    name: desktop (${{ matrix.name }})
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v7
@@ -57,7 +125,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with: { targets: "${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}" }
       - uses: swatinem/rust-cache@v2
-        with: { workspaces: "packages/desktop/src-tauri -> target" }
+        with: { workspaces: "packages/desktop/src-tauri -> target", key: "${{ matrix.name }}" }
       - if: matrix.platform == 'ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - run: npm ci --ignore-scripts
@@ -65,17 +133,33 @@ jobs:
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         with:
           projectPath: packages/desktop
-          tagName: ${{ github.ref_name }}
-          releaseName: "Super Orkestra ${{ github.ref_name }}"
-          releaseBody: "Kurulum ve değişiklikler için README ve CHANGELOG'a bakın."
-          releaseDraft: true
+          # etiket itildiğinde prepare'in açtığı taslağa yükler; elle çalıştırmada yalnızca iş yapıtı üretir
+          releaseId: ${{ needs.prepare.outputs.release_id }}
+          uploadUpdaterJson: false
+          uploadWorkflowArtifacts: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          workflowArtifactNamePattern: "desktop-${{ matrix.name }}-[bundle]"
+          retryAttempts: 1
           args: ${{ matrix.args }}
 
-  attach:
-    needs: [publish, desktop]
+  publish:
+    needs: [prepare, packages, desktop]
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}", TAG: "${{ github.ref_name }}", RELEASE_ID: "${{ needs.prepare.outputs.release_id }}" }
     steps:
       - uses: actions/download-artifact@v7
-        with: { name: vsix }
-      - run: gh release upload "${GITHUB_REF_NAME}" *.vsix --clobber --repo "${GITHUB_REPOSITORY}"
-        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        with: { name: packages, path: release-assets }
+      - name: Paketleri yükle
+        run: gh release upload "$TAG" release-assets/* --clobber --repo "$GITHUB_REPOSITORY"
+      - name: SHA256SUMS.txt
+        run: |
+          mkdir all && cd all
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets" --paginate --jq '.[] | select(.name != "SHA256SUMS.txt") | "\(.id) \(.name)"' |
+            while read -r id name; do
+              gh api -H "Accept: application/octet-stream" "repos/$GITHUB_REPOSITORY/releases/assets/$id" > "$name"
+            done
+          sha256sum * | tee ../SHA256SUMS.txt
+          cd .. && gh release upload "$TAG" SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+      - name: Yayımla
+        run: |
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" -F draft=false -F prerelease=false -f make_latest=true --jq '.html_url'

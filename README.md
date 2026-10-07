@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml"><img src="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/cumabozkurt/super-orkestra/releases/latest"><img src="https://img.shields.io/github/v/release/cumabozkurt/super-orkestra?sort=semver" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A5%2022.16-339933?logo=node.js&logoColor=white" alt="Node.js ≥ 22.16">
   <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict">
@@ -75,7 +76,7 @@ For the full picture (routing formula, review triggers, the resume decision tabl
 ## Quick start
 
 > [!NOTE]
-> The npm packages, the VS Code extension and the desktop installers are **not published yet**. The tag-driven [`release.yml`](.github/workflows/release.yml) workflow is ready for that. Until then, install from source as shown below.
+> **v1.0.0 is out on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest)** with the CLI tarballs, the VS Code `.vsix` and desktop installers for Windows, macOS and Linux. The packages are not on the npm registry, the VS Code Marketplace or Open VSX yet, so install them from the release as shown below.
 
 **Requirements:** Node.js **≥ 22.16** (needs the built-in `node:sqlite` with FTS5), git, and at least one agent CLI you are logged into.
 
@@ -83,15 +84,39 @@ For the full picture (routing formula, review triggers, the resume decision tabl
 # 1) The agent CLIs you want to use (any subset)
 npm i -g @anthropic-ai/claude-code @openai/codex @google/gemini-cli opencode-ai
 
-# 2) Super Orkestra from source
-git clone https://github.com/cumabozkurt/super-orkestra.git && cd super-orkestra
-npm install && npm run build
-npm link -w super-orkestra        # puts `super-orkestra` and `orkestra` on your PATH
+# 2) Super Orkestra CLI from the v1.0.0 release (both tarballs in ONE command)
+npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
+         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
+super-orkestra --version          # 1.0.0 — `orkestra` is the short alias
 
 # 3) Run it in your project (a git repository)
 cd ~/code/my-project
 super-orkestra run "add 2FA to the login page and write tests for it"
 ```
+
+<details>
+<summary>Install from source instead</summary>
+
+```bash
+git clone https://github.com/cumabozkurt/super-orkestra.git && cd super-orkestra
+npm install && npm run build
+npm link -w super-orkestra        # puts `super-orkestra` and `orkestra` on your PATH
+```
+</details>
+
+### Downloads (v1.0.0)
+
+Everything is attached to the **[latest release](https://github.com/cumabozkurt/super-orkestra/releases/latest)**. `SHA256SUMS.txt` lists the checksum of every file.
+
+| Component | Files | Install |
+|---|---|---|
+| CLI + MCP server | `super-orkestra-core-1.0.0.tgz`, `super-orkestra-1.0.0.tgz` | the `npm i -g …` line above (the CLI needs the core tarball next to it) |
+| VS Code extension | `super-orkestra-vscode-1.0.0.vsix` | `code --install-extension super-orkestra-vscode-1.0.0.vsix`, or Extensions → `…` → *Install from VSIX…* |
+| Desktop app · Windows | `.msi`, `-setup.exe` | run the installer |
+| Desktop app · macOS | `.dmg` (`aarch64` = Apple Silicon, `x64` = Intel) | open the `.dmg` and drag the app to Applications |
+| Desktop app · Linux | `.AppImage`, `.deb`, `.rpm` | `chmod +x` the AppImage, or install the package |
+
+The desktop builds are **not code-signed**. Windows SmartScreen may ask you to confirm (*More info → Run anyway*). On macOS, right-click the app → *Open* the first time, or run `xattr -dr com.apple.quarantine "/Applications/Super Orkestra.app"`. The desktop app and the VS Code extension both drive the CLI, so install the CLI first.
 
 No configuration file is needed. The defaults are a Claude Code conductor and Claude Code / Codex / opencode workers, with gates detected from the project. To choose your own conductor and workers, copy [`orkestra.config.example.json`](orkestra.config.example.json) into your project as `orkestra.config.json`.
 
@@ -195,7 +220,8 @@ More answers: **[docs/faq.md](docs/faq.md)**.
 
 These are candidates, not promises. Discussion and PRs are welcome.
 
-- [ ] First public release: npm packages, VS Code Marketplace / Open VSX, and signed desktop installers through `release.yml`.
+- [x] First GitHub release ([v1.0.0](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0)): CLI tarballs, `.vsix`, desktop installers for Windows, macOS and Linux.
+- [ ] Publish to npm, the VS Code Marketplace / Open VSX, and ship code-signed desktop installers (`release.yml` already does this once the secrets are set).
 - [ ] Use the router's existing "ambiguous" signal to ask the conductor a one-line tie-break question.
 - [ ] Inject the other memory-bank files (`project.md`, `decisions.md`) within the token budget, not just `conventions.md`.
 - [ ] Run independent tasks of a plan in parallel (tasks currently run one after another).

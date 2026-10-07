@@ -4,6 +4,25 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-10-08
+İlk kararlı sürüm. Proje adı **Orkestra → Super Orkestra** oldu. İlk GitHub sürümü: [v1.0.0](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0).
+
+### Değişti
+- npm paketleri: `super-orkestra` (CLI) ve `super-orkestra-core`. Eski belgelerdeki `npm i -g orkestra` başka birine ait bir paketi kuruyordu; artık doğru ad kullanılıyor.
+- CLI hem `super-orkestra` hem kısa ad `orkestra` olarak kuruluyor. Yapılandırma dosyası (`orkestra.config.json`), `.orkestra/` klasörü, `ORKESTRA_*` ortam değişkenleri ve VS Code ayar/komut kimlikleri geriye uyumluluk için aynı kaldı.
+- Claude statusline kancası CLI paketine taşındı: `"command": "super-orkestra statusline"`.
+- Masaüstü uygulaması: "Super Orkestra", kimlik `dev.superorkestra.app`, tüm platformlar için simgeler (.ico/.icns/.png).
+- VS Code eklentisi: `super-orkestra.super-orkestra-vscode`, simgeli.
+
+### Eklendi
+- GitHub'a hazırlık: CI (Windows/macOS/Linux × Node 22/24, paket kuru çalıştırması, .vsix), tek etiketle GitHub Release açan `release.yml`, Dependabot, hata/özellik şablonları, PR şablonu, CONTRIBUTING, SECURITY, `.editorconfig`, `.gitattributes`.
+- `npm run set-repo -- <kullanıcı>`: belgelerdeki GitHub adresi yer tutucusunu doldurur.
+- npm paketlerinde `files`, `types`, `repository`, `engines` alanları (önceden `dist/` .gitignore yüzünden yayından düşecekti).
+- 10 yeni regresyon testi (toplam 75). `npm run typecheck` (tüm paketler + testler), `npm run check` ve `npm run smoke` betikleri.
+- CI: tip denetimi adımı ve masaüstü için `cargo check` işi.
+- İngilizce `README.md` (+ `README.tr.md`), `docs/` altında ayrıntılı belgeler (başlangıç, yapılandırma, mimari, CLI, MCP, VS Code, masaüstü, SSS), `CODE_OF_CONDUCT.md`, masaüstü paketi README'si. Araştırma raporları `docs/research/` altına taşındı.
+- **GitHub Release iş akışı:** `v*` etiketi itildiğinde sürüm alanları denetlenir, notlar bu dosyadan alınır; masaüstü kurulumları (Windows `.msi`/`.exe`, macOS Apple Silicon + Intel `.dmg`, Linux `.AppImage`/`.deb`/`.rpm`), VS Code `.vsix`, CLI'ın npm tarball'ları ve `SHA256SUMS.txt` sürüme eklenir. npm / VS Code Marketplace / Open VSX yayını yalnızca ilgili sır (`NPM_TOKEN`, `VSCE_PAT`, `OVSX_PAT`) tanımlıysa yapılır, yoksa adım atlanır.
+
 ### Düzeltildi
 - **Node sürümü:** `engines` alanı `>=22.13` yerine `>=22.16`. Node 22.13–22.15'in yerleşik SQLite'ında FTS5 yok, bu sürümlerde hafıza katmanı `no such module: fts5` ile çöküyordu. Artık net bir hata mesajı veriliyor.
 - **ACP işçisi süreci çökertiyordu:** ajan ikilisi yoksa ya da başlatılamıyorsa (`opencode`/`gemini` için varsayılan taşıma `auto` = önce ACP) dinlenmeyen `error` olayı tüm CLI'ı düşürüyordu. Artık başarısız sonuç dönüyor ve CLI taşımasına geçiliyor.
@@ -21,26 +40,6 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 - **CLI:** `usage` kayıt yokken de aynı biçimi döndürüyor. `map --tokens` doğrulanıyor. `resume-daemon` başka projelerin şeflerini önbelleğe alıyor.
 - Windows CI'da çalışmayacak `printf` kullanan test düzeltildi. Testlerdeki tip hataları giderildi.
 
-### Eklendi
-- 10 yeni regresyon testi (toplam 75). `npm run typecheck` (tüm paketler + testler), `npm run check` ve `npm run smoke` betikleri.
-- CI: tip denetimi adımı ve masaüstü için `cargo check` işi.
-- İngilizce `README.md` (+ `README.tr.md`), `docs/` altında ayrıntılı belgeler (başlangıç, yapılandırma, mimari, CLI, MCP, VS Code, masaüstü, SSS), `CODE_OF_CONDUCT.md`, masaüstü paketi README'si. Araştırma raporları `docs/research/` altına taşındı.
-
-## [1.0.0] — 2026-10-07
-İlk kararlı sürüm. Proje adı **Orkestra → Super Orkestra** oldu.
-
-### Değişti
-- npm paketleri: `super-orkestra` (CLI) ve `super-orkestra-core`. Eski belgelerdeki `npm i -g orkestra` başka birine ait bir paketi kuruyordu; artık doğru ad kullanılıyor.
-- CLI hem `super-orkestra` hem kısa ad `orkestra` olarak kuruluyor. Yapılandırma dosyası (`orkestra.config.json`), `.orkestra/` klasörü, `ORKESTRA_*` ortam değişkenleri ve VS Code ayar/komut kimlikleri geriye uyumluluk için aynı kaldı.
-- Claude statusline kancası CLI paketine taşındı: `"command": "super-orkestra statusline"`.
-- Masaüstü uygulaması: "Super Orkestra", kimlik `dev.superorkestra.app`, tüm platformlar için simgeler (.ico/.icns/.png).
-- VS Code eklentisi: `super-orkestra.super-orkestra-vscode`, simgeli.
-
-### Eklendi
-- GitHub'a hazırlık: CI (Windows/macOS/Linux × Node 22/24, paket kuru çalıştırması, .vsix), tek etiketle npm + VS Code + masaüstü yayını yapan `release.yml`, Dependabot, hata/özellik şablonları, PR şablonu, CONTRIBUTING, SECURITY, `.editorconfig`, `.gitattributes`.
-- `npm run set-repo -- <kullanıcı>`: belgelerdeki GitHub adresi yer tutucusunu doldurur.
-- npm paketlerinde `files`, `types`, `repository`, `engines` alanları (önceden `dist/` .gitignore yüzünden yayından düşecekti).
-
 ## [0.3.5] — 2026-10-07
 **ACP çalışıyor:** opencode `session/new` hatasının kökü `HTTP(S)_PROXY` idi (opencode yerel 127.0.0.1 çağrılarını vekile yolluyordu); ajan ortamına NO_PROXY eklendi. Gerçek opencode 1.18.35 ile ACP yeni oturum + `loadSession` devamı doğrulandı; opencode/gemini için varsayılan taşıma `auto` (ACP, düşerse CLI). **tree-sitter repo haritası:** `@vscode/tree-sitter-wasm` ile 16 dil (TS/TSX/JS/Python/Go/Rust/Java/C#/Ruby/PHP/C/C++), yorum ve dizgelerdeki sözde tanımlar artık sayılmıyor; yüklenemezse regex'e düşer. **Yarım iş korunuyor:** limitte başka işçiye devirde ya da oturum kimliği dönmeyen devamda worktree atılmıyor, yeni işçiye mevcut diff ile "kaldığın yerden tamamla" brifi gidiyor. **Boş worktree klasörleri** temizleniyor (`git worktree prune` + boş kök silme). **Masaüstü Windows:** `orkestra.cmd` için `cmd /d /c orkestra <alt komut>`; kullanıcı metni argüman değil `ORKESTRA_INPUT` ortam değişkeniyle gidiyor, izin kapsamı sabit alt komutlara daraltıldı. Ayrıca: `package.json`'daki var olmayan `claude-agent-sdk@^0.3.492` sürümü `npm ci`'ı (dolayısıyla CI'ı) kırıyordu; kullanılmayan iki SDK kaldırıldı. Kapılara 10 dk zaman aşımı + `CI=1` (izleme modunda takılma yok). Şef planı normalize ediliyor (yinelenen id, geçersiz alanlar, boş plan, bozuk JSON'da bir kez yeniden sorma); geçersiz denetim kararı "fix" sayılıyor
 
@@ -55,3 +54,6 @@ limitte duraklayan iş artık **aynı işçi + aynı oturum + korunmuş yarım w
 
 ## [0.3.1] ve öncesi
 Claude Code / Codex / Gemini için kod düzeyinde ajan testleri, opencode ücretsiz modelleriyle gerçek uçtan uca koşu, MCP sunucusu, VS Code eklentisi, Tauri masaüstü, limit devri ve otomatik devam senaryoları (S3/S4).
+
+[Unreleased]: https://github.com/cumabozkurt/super-orkestra/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0

@@ -13,7 +13,13 @@
 
 ## Install
 
-The extension is not on the Marketplace yet. Build the `.vsix` from source:
+The extension is not on the Marketplace or Open VSX yet. Download `super-orkestra-vscode-1.0.0.vsix` from the [v1.0.0 release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0) and install it:
+
+```bash
+code --install-extension super-orkestra-vscode-1.0.0.vsix
+```
+
+Or build the `.vsix` from source:
 
 ```bash
 npm install

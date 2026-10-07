@@ -53,7 +53,9 @@ See [docs/architecture.md](docs/architecture.md) for how the pieces fit together
 ## Releasing (maintainers)
 
 1. Update `CHANGELOG.md`. Bump the version in every `package.json` (root, core, cli, vscode, desktop), in the `super-orkestra-core` dependency of `packages/cli/package.json`, in `packages/desktop/src-tauri/Cargo.toml` and in `tauri.conf.json`.
-2. `git tag vX.Y.Z && git push --tags`. [`release.yml`](.github/workflows/release.yml) checks that the tag matches the CLI version, publishes the npm packages (secret `NPM_TOKEN`) and the VS Code extension (optional `VSCE_PAT` / `OVSX_PAT`), and collects the desktop installers in a **draft** GitHub Release.
+   Move the `[Unreleased]` notes into a new `## [X.Y.Z] — YYYY-MM-DD` section: that section becomes the release notes.
+2. Optional dry run: *Actions → release → Run workflow* on `main` builds every package and installer as workflow artifacts without creating a release.
+3. `git tag vX.Y.Z && git push origin vX.Y.Z`. [`release.yml`](.github/workflows/release.yml) checks that every version field matches the tag and opens a draft GitHub Release with the CHANGELOG section as notes. It attaches the CLI tarballs, the `.vsix`, the desktop installers for all platforms and `SHA256SUMS.txt`, then publishes the release. npm (`NPM_TOKEN`), the VS Code Marketplace (`VSCE_PAT`) and Open VSX (`OVSX_PAT`) are published only when those secrets exist; without them the steps are skipped.
 
 ---
 

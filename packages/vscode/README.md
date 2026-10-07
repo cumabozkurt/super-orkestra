@@ -14,7 +14,9 @@ Your strongest model conducts and up to three worker models write the code, each
 ## Requirements
 
 1. VS Code 1.140+ with a chat provider (e.g. GitHub Copilot Chat) for the chat participant.
-2. The Super Orkestra CLI on your `PATH`. It is not on npm yet, so install from source: `git clone https://github.com/cumabozkurt/super-orkestra.git && cd super-orkestra && npm install && npm run build && npm link -w super-orkestra`
+2. The Super Orkestra CLI on your `PATH`. Install it from the [v1.0.0 release](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0): `npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz` (or from source, see the main README).
+
+The extension itself is `super-orkestra-vscode-1.0.0.vsix` on the same release page: `code --install-extension super-orkestra-vscode-1.0.0.vsix`.
 
 ## Settings
 

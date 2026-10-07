@@ -3,7 +3,7 @@
 This guide takes you from zero to your first orchestrated change.
 
 > [!NOTE]
-> Super Orkestra is not on npm, the VS Code Marketplace or GitHub Releases yet. The steps below install it from source. Once a release is published, `npm i -g super-orkestra` will replace step 2.
+> Super Orkestra **v1.0.0** is on [GitHub Releases](https://github.com/cumabozkurt/super-orkestra/releases/latest). It is not on the npm registry yet, so step 2 installs the CLI from the release tarballs (or from source).
 
 ## 1. Prerequisites
 
@@ -24,7 +24,21 @@ npm i -g opencode-ai                 # opencode     -> agent "opencode" (has fre
 
 Run each CLI once interactively to log in.
 
-## 2. Install Super Orkestra from source
+## 2. Install Super Orkestra
+
+### From the v1.0.0 release (recommended)
+
+The CLI tarball depends on the core tarball, so pass **both URLs in one command**:
+
+```bash
+npm i -g https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-core-1.0.0.tgz \
+         https://github.com/cumabozkurt/super-orkestra/releases/download/v1.0.0/super-orkestra-1.0.0.tgz
+super-orkestra --version   # 1.0.0
+```
+
+The release also has the VS Code extension (`.vsix`) and desktop installers. See [VS Code extension](vscode-extension.md) and [Desktop app](desktop-app.md).
+
+### From source
 
 ```bash
 git clone https://github.com/cumabozkurt/super-orkestra.git
