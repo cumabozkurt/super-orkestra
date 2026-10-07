@@ -16,7 +16,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
       - run: git config --global user.email ci@example.com && git config --global user.name ci
@@ -51,7 +51,7 @@ jobs:
           - { platform: windows-latest, args: "" }
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm }
       - uses: dtolnay/rust-toolchain@stable
