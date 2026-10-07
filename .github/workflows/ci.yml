@@ -35,7 +35,7 @@ jobs:
       - run: npm ci --ignore-scripts && npm run build
       - run: npm pack --dry-run -w super-orkestra-core -w super-orkestra
       - run: npm run package:vscode
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with: { name: vsix, path: packages/vscode/*.vsix }
 
   desktop:

@@ -37,7 +37,7 @@ jobs:
       - name: Open VSX
         if: env.OVSX_PAT != '' && startsWith(github.ref, 'refs/tags/')
         run: npx ovsx publish packages/vscode/*.vsix -p "$OVSX_PAT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with: { name: vsix, path: packages/vscode/*.vsix }
 
   desktop:
