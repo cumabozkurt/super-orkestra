@@ -11,7 +11,7 @@ import { LimitTracker } from "../packages/core/src/limits/tracker.js";
 import { Conductor, type Planner } from "../packages/core/src/router/conductor.js";
 import { Memory } from "../packages/core/src/memory/memory.js";
 import { ResumeScheduler } from "../packages/core/src/limits/scheduler.js";
-import type { Config, TaskBrief } from "../packages/core/src/types.js";
+import type { Config, TaskBrief, WorkerConfig } from "../packages/core/src/types.js";
 
 const FAKE = join(__dirname, "fixtures", "fake-agent.mjs");
 const AGENTS = [
@@ -85,7 +85,7 @@ describe("abonelik limit takibi", () => {
       { type: "event_msg", payload: { type: "token_count", rate_limits: { primary: { used_percent: 10, window_minutes: 300, resets_at: reset } } } },
       { type: "event_msg", payload: { type: "token_count", rate_limits: { primary: { used_percent: 99, window_minutes: 300, resets_at: reset }, secondary: { used_percent: 50, window_minutes: 10080, resets_at: reset + 9e4 } } } },
     ].map(o => JSON.stringify(o)).join("\n"));
-    const t = new LimitTracker(95); const ws = [{ id: "w2", agent: "codex", model: "", strengths: [] }, { id: "w3", agent: "gemini", model: "", strengths: [] }];
+    const t = new LimitTracker(95); const ws: WorkerConfig[] = [{ id: "w2", agent: "codex", model: "", strengths: [] }, { id: "w3", agent: "gemini", model: "", strengths: [] }];
     expect(t.blockedWorkers(ws)).toEqual(["w2"]); expect((t.snapshot() as any).codex[1].windowMin).toBe(10080);
   });
 });
@@ -128,7 +128,7 @@ describe("denetim düzeltmeleri", () => {
   });
   it("hepsi limitteyken en erken açılan pencereye göre beklenir", () => {
     const t = new LimitTracker(); const now = Math.floor(Date.now() / 1000);
-    const ws = [{ id: "a", agent: "claude-code", model: "", strengths: [] }, { id: "b", agent: "codex", model: "", strengths: [] }];
+    const ws: WorkerConfig[] = [{ id: "a", agent: "claude-code", model: "", strengths: [] }, { id: "b", agent: "codex", model: "", strengths: [] }];
     t.record(ws[0], { limitHit: { resetsAt: now + 7200, provider: "c" } } as any); t.record(ws[1], { limitHit: { resetsAt: now + 1800, provider: "x" } } as any);
     expect(t.earliestReset(ws)).toBe(now + 1800);
   });
@@ -164,7 +164,7 @@ describe("ikinci denetim düzeltmeleri", () => {
     expect(a.at(-2)).toBe("SID");
   });
   it("çıktıdan yakalanan limit, refresh() sonrası silinmez", () => {
-    const t = new LimitTracker(); const w = { id: "c", agent: "codex", model: "", strengths: [] };
+    const t = new LimitTracker(); const w: WorkerConfig = { id: "c", agent: "codex", model: "", strengths: [] };
     t.record(w, { limitHit: { resetsAt: Math.floor(Date.now() / 1000) + 3600, provider: "codex" } } as any);
     t.refresh(); expect(t.blockedWorkers([w])).toEqual(["c"]);
   });
@@ -174,7 +174,7 @@ describe("ikinci denetim düzeltmeleri", () => {
     expect(detectLimit("You've hit your limit · resets 3pm (Europe/Istanbul)", "c", now)!.resetsAt).toBe(Date.UTC(2026, 9, 7, 12, 0, 0) / 1000);
     expect(detectLimit("You've hit your limit · resets 3pm (America/New_York)", "c", now)!.resetsAt).toBe(Date.UTC(2026, 9, 7, 19, 0, 0) / 1000);
     expect(detectLimit("You've hit your limit · resets 9am (Europe/Istanbul)", "c", now)!.resetsAt).toBe(Date.UTC(2026, 9, 8, 6, 0, 0) / 1000);
-    expect(detectLimit("You've hit your limit · resets 2am (Europe/London)", "c", Date.UTC(2026, 9, 24, 12)).resetsAt).toBe(Date.UTC(2026, 9, 25, 2, 0, 0) / 1000); // BST→GMT geçişi
+    expect(detectLimit("You've hit your limit · resets 2am (Europe/London)", "c", Date.UTC(2026, 9, 24, 12))!.resetsAt).toBe(Date.UTC(2026, 9, 25, 2, 0, 0) / 1000); // BST→GMT geçişi
   });
   it("Windows'ta .cmd sarmalayıcısı kabuksuz node betiğine çözülür", async () => {
     const { resolveSpawn } = await import("../packages/core/src/workers/cli-stream.js");
@@ -188,7 +188,7 @@ describe("ikinci denetim düzeltmeleri", () => {
   });
   it("OpenRouter işçisinin diff'i worktree'ye gerçekten uygulanır", async () => {
     const { applyDiff } = await import("../packages/core/src/workers/openrouter.js");
-    const d = tmp("or-"); execSync("git init -q && printf 'a\\nb\\n' > f.txt", { cwd: d });
+    const d = tmp("or-"); execSync("git init -q", { cwd: d }); writeFileSync(join(d, "f.txt"), "a\nb\n"); // printf/tek tırnak Windows cmd'de yok
     const r = applyDiff(d, "İşte:\n```diff\n--- a/f.txt\n+++ b/f.txt\n@@ -1,2 +1,2 @@\n a\n-b\n+c\n```\n");
     expect(r.ok).toBe(true); expect(readFileSync(join(d, "f.txt"), "utf8")).toBe("a\nc\n");
     expect(applyDiff(d, "diff yok").ok).toBe(false);

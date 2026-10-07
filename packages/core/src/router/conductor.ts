@@ -139,8 +139,12 @@ export class Conductor extends EventEmitter {
     if (this.overBudget(brief.id)) { const note = `token bütçesi aşıldı (${this.spent.get(brief.id)} ≥ ${this.cfg.budget.maxTokensPerTask}); son not: ${review.note}`;
       this.emit("failed", { task: brief.id, note }); this.log({ kind: "budget", task: brief.id, spent: this.spent.get(brief.id) }); return "failed"; }
     const fixed: TaskBrief = { ...brief, context: `${brief.context}\n\nŞef düzeltmesi (deneme ${attempt + 1}): ${review.note}` };
-    // "fix": aynı işçi (önbellek sıcak), "reassign": başka işçi
-    return review.verdict === "fix" ? this.runTask(fixed, attempt + 1, exclude) : this.runTask(fixed, attempt + 1, [...exclude, wc.id]);
+    // "fix": aynı işçi (önbellek sıcak), "reassign": başka işçi.
+    // Başka müsait işçi yoksa (ör. tek işçili yapılandırma) "reassign" aynı işçiyle düzeltmeye döner; önceden bu durum
+    // "hepsi limitte" sanılıp görev limit olmadığı hâlde 1 saatliğine duraklatılıyordu.
+    const others = [...exclude, wc.id];
+    const canReassign = review.verdict === "reassign" && this.cfg.workers.some(w => !others.includes(w.id));
+    return canReassign ? this.runTask(fixed, attempt + 1, others) : this.runTask(fixed, attempt + 1, exclude);
   }
 
   private pauseUntilReset(brief: TaskBrief, workerId: string, sessionId?: string, resetsAt?: number, worktree?: Worktree) {
@@ -158,7 +162,7 @@ export function testsWeakened(diff: string): boolean {
   for (const line of diff.split("\n")) {
     if (line.startsWith("--- ")) { file = line.slice(4).replace(/^a\//, ""); continue; }
     if (line.startsWith("+++ ")) { const f = line.slice(4); if (f !== "/dev/null") file = f.replace(/^b\//, ""); continue; }
-    if (!/(^|\/)(tests?|__tests__|spec)\/|\.(test|spec)\.[jt]sx?$|_test\.(go|py)$|^test_.*\.py$/.test(file)) continue;
+    if (!/(^|\/)(tests?|__tests__|spec)\/|\.(test|spec)\.[cm]?[jt]sx?$|_test\.(go|py)$|(^|\/)test_[^/]*\.py$/.test(file)) continue;
     if (line.startsWith("-") && !line.startsWith("---") && /assert|expect|test\(|it\(|def test_/.test(line)) return true;
   }
   return false;

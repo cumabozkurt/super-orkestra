@@ -2,18 +2,21 @@
   "name": "super-orkestra-monorepo",
   "private": true,
   "version": "1.0.0",
-  "description": "Super Orkestra — açık kaynak AI kodlama orkestratörü: 1 şef model + 3 işçi model, minimum token, kalıcı hafıza, limit sonrası otomatik devam.",
+  "description": "Super Orkestra — open-source AI coding orchestrator: one conductor model plans and reviews, three worker models code in isolated git worktrees. Minimal tokens, persistent memory, automatic resume after subscription limits.",
   "license": "MIT",
   "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "engines": {
-    "node": ">=22.13"
+    "node": ">=22.16"
   },
   "scripts": {
     "build": "npm run build -w super-orkestra-core && npm run build -w super-orkestra -w super-orkestra-vscode -w super-orkestra-desktop",
+    "typecheck": "tsc -p packages/core --noEmit && tsc -p packages/cli --noEmit && tsc -p packages/vscode --noEmit && tsc -p packages/desktop && tsc -p tsconfig.tests.json",
     "test": "vitest run",
+    "check": "npm run build && npm run typecheck && npm test",
+    "smoke": "node scripts/smoke.mjs",
     "dev:desktop": "npm run tauri dev -w super-orkestra-desktop",
     "package:vscode": "npm run package -w super-orkestra-vscode",
     "set-repo": "node scripts/set-repo.mjs"
@@ -32,5 +35,19 @@
   "homepage": "https://github.com/cumabozkurt/super-orkestra#readme",
   "bugs": {
     "url": "https://github.com/cumabozkurt/super-orkestra/issues"
-  }
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestrator",
+    "coding-agent",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "opencode",
+    "openrouter",
+    "mcp",
+    "acp",
+    "git-worktree"
+  ]
 }

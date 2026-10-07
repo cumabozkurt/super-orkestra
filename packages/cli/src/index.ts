@@ -11,16 +11,19 @@ import {
 } from "super-orkestra-core";
 
 let running = 0; const busy = () => running > 0;
+/** Başka projelere ait devam işleri için kurulan şefler önbelleğe alınır (her işte yeniden kurulup sızmasın). */
+const others = new Map<string, Conductor>();
 export function boot(cwd = process.cwd(), quiet = false) {
   const cfg = loadConfig(cwd);
   const memory = new Memory(join(cwd, cfg.memory.dir));
   const limits = new LimitTracker(cfg.limits.pauseAtPercent);
-  const workers = new Map(cfg.workers.map(w => [w.id, makeWorker(w)]));
+  const workers = new Map(cfg.workers.map(w => [w.id, makeWorker(w, cfg.providers)]));
   let conductor!: Conductor;
   const scheduler = new ResumeScheduler(async job => {
     if (!quiet) console.log(`▶ Limit sıfırlandı, devam: ${job.brief.id} (${job.workerId})`);
     // İş başka bir projeye aitse o projenin şefini kur (resume-daemon tüm projeleri sürdürür)
-    const k = job.cwd && job.cwd !== cwd ? boot(job.cwd, quiet).conductor : conductor;
+    let k = conductor;
+    if (job.cwd && job.cwd !== cwd) { k = others.get(job.cwd) ?? boot(job.cwd, quiet).conductor; others.set(job.cwd, k); }
     running++; const r = await k.runTask(job.brief, 0, [], { workerId: job.workerId, sessionId: job.sessionId, worktree: job.worktree }).finally(() => running--);
     if (!quiet) console.log(`■ Devam sonucu ${job.brief.id}: ${r}`);
   });
@@ -40,9 +43,9 @@ export function boot(cwd = process.cwd(), quiet = false) {
 }
 
 function usageReport(cwd: string) {
-  const f = join(cwd, ".orkestra", "usage.jsonl"); if (!existsSync(f)) return { tasks: 0, byWorker: {} };
   const byWorker: Record<string, { runs: number; input: number; output: number; cacheRead: number }> = {};
   const conductor = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+  const f = join(cwd, ".orkestra", "usage.jsonl"); if (!existsSync(f)) return { byWorker, conductor }; // kayıt yokken de aynı biçim
   for (const l of readFileSync(f, "utf8").trim().split("\n")) {
     let e: any; try { e = JSON.parse(l); } catch { continue; } // yarım yazılmış satır
     if (e.kind === "work") { const w = (byWorker[e.worker] ??= { runs: 0, input: 0, output: 0, cacheRead: 0 }); w.runs++; w.input += e.usage.input; w.output += e.usage.output; w.cacheRead += e.usage.cacheRead; }
@@ -73,7 +76,9 @@ p.command("run <goal...>").description("Hedefi ver; şef planlar, dağıtır, de
 p.command("mcp").description("MCP sunucusu (stdio) olarak çalış").action(async () => { const cwd = process.cwd(); const b = boot(cwd, true); await startMcp(b.conductor, b.memory, b.limits, f => buildRepoMapAsync(cwd, 1500, f ?? ""), VERSION); });
 p.command("limits").description("Abonelik limit durumu (JSON)").action(() => { const l = new LimitTracker(); l.refresh(); console.log(JSON.stringify(l.snapshot(), null, 2)); });
 p.command("usage").description("Token kullanım özeti (JSON)").action(() => console.log(JSON.stringify(usageReport(process.cwd()), null, 2)));
-p.command("map").description("Repo haritasını göster").option("-t, --tokens <n>", "token bütçesi", "1500").option("-f, --focus <metin>", "hedefe odakla", "").action(async (o: any) => console.log(await buildRepoMapAsync(process.cwd(), Number(o.tokens), o.focus)));
+p.command("map").description("Repo haritasını göster").option("-t, --tokens <n>", "token bütçesi", "1500").option("-f, --focus <metin>", "hedefe odakla", "").action(async (o: any) => {
+  const n = Number(o.tokens); if (!(n > 0)) { console.error("--tokens pozitif bir sayı olmalı."); process.exitCode = 2; return; }
+  console.log(await buildRepoMapAsync(process.cwd(), n, o.focus)); });
 p.command("resume-daemon").description("Limit sıfırlanınca bekleyen oturumları sürdüren arka plan servisi").action(() => {
   const { scheduler } = boot(); console.log(`Bekleyen devam görevi: ${scheduler.pending().length}`); scheduler.arm(true);
 });

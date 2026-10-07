@@ -13,8 +13,12 @@ const root = () => vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process
 /** Kullanıcı metni argüman olarak değil stdin'den gider: Windows'ta shell:true ile tırnak/yeni satır bozulmasın, enjeksiyon olmasın. */
 function run(args: string[], onData?: (s: string) => void, token?: vscode.CancellationToken, input?: string, stdoutOnly = false) {
   return new Promise<string>(res => {
-    const p = spawn(bin(), args, { cwd: root(), shell: process.platform === "win32", windowsHide: true });
+    // Windows'ta npm global komutları .cmd olduğundan kabuk gerekir; argümanlar sabittir (kullanıcı metni stdin'den gider).
+    // Boşluk içeren tam yol (ör. "C:\Program Files\...") cmd.exe'de bölünmesin diye tırnaklanır.
+    const win = process.platform === "win32"; const b = bin();
+    const p = spawn(win && /\s/.test(b) && !/^".*"$/.test(b) ? `"${b}"` : b, args, { cwd: root(), shell: win, windowsHide: true });
     let out = ""; token?.onCancellationRequested(() => p.kill());
+    p.stdin.on("error", () => { /* süreç başlamadıysa EPIPE; asıl hata 'error' olayında raporlanır */ });
     if (input !== undefined) p.stdin.end(input); else p.stdin.end();
     p.stdout.on("data", d => { out += d; onData?.(String(d)); });
     p.stderr.on("data", d => { if (!stdoutOnly) out += d; });

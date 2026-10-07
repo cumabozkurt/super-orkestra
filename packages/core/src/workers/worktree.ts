@@ -12,11 +12,20 @@ const git = (cwd: string, ...args: string[]) => execFileSync("git", args, { cwd,
 
 export interface Worktree { path: string; branch: string; base: string }
 
+/**
+ * Görev/işçi kimliğini geçerli bir git dal adı parçasına çevirir. Şef planından gelen "t1..2" ya da ".x" gibi kimlikler
+ * geçersiz dal adı üretip `git worktree add`'i düşürüyordu; bu durumda işçi izolasyonsuz ana çalışma ağacında koşuyordu.
+ */
+export function refSafe(s: string): string {
+  const r = String(s).replace(/[^\w.-]/g, "-").replace(/\.{2,}/g, "-").replace(/^[.-]+/, "").replace(/(\.lock)+$/i, "").replace(/\.+$/, "");
+  return r || "x";
+}
+
 export function isGitRepo(cwd: string) { try { git(cwd, "rev-parse", "--is-inside-work-tree"); return true; } catch { return false; } }
 
 export function createWorktree(repo: string, taskId: string, workerId: string): Worktree {
   const base = git(repo, "rev-parse", "HEAD");
-  const branch = `orkestra/${taskId}-${workerId}-${Date.now().toString(36)}`.replace(/[^\w/.-]/g, "-");
+  const branch = `orkestra/${refSafe(taskId)}-${refSafe(workerId)}-${Date.now().toString(36)}`;
   // Repo DIŞINDA tutulur: bazı ajanlar (ör. opencode) iç içe dizinde ana repoyu proje kökü sanıp oraya yazıyor.
   const id = `${basename(repo)}-${createHash("sha1").update(repo).digest("hex").slice(0, 8)}`;
   const dir = join(orkHome(), "worktrees", id);

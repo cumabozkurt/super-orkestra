@@ -23,14 +23,19 @@ const ork = (sub: Sub, opts: { cwd?: string; input?: string } = {}) => {
   return WIN ? Command.create(opts.input !== undefined ? "orkestra-win-input" : "orkestra-win", ["/d", "/c", "orkestra", ...args], o)
              : Command.create(opts.input !== undefined ? "orkestra-input" : "orkestra", args, o);
 };
-async function json(sub: Sub, cwd?: string) { const r = await ork(sub, { cwd }).execute(); try { return JSON.parse(r.stdout); } catch { return { hata: r.stderr || r.stdout }; } }
+const NOT_FOUND = "Super Orkestra CLI çalıştırılamadı. `npm i -g super-orkestra` ile kurun ve `orkestra` komutunun PATH'te olduğundan emin olun.";
+/** CLI yoksa execute() reddeder; önceden bu yakalanmıyordu (işlenmemiş promise hatası, boş sekmeler). */
+async function json(sub: Sub, cwd?: string) {
+  let r; try { r = await ork(sub, { cwd }).execute(); } catch (e) { return { hata: `${NOT_FOUND}\n${e}` }; }
+  try { return JSON.parse(r.stdout); } catch { return { hata: r.stderr || r.stdout }; }
+}
 
 function App() {
   const [tab, setTab] = useState<Tab>("run");
   const [cwd, setCwd] = useState(localStorage.getItem("cwd") ?? "");
   const [goal, setGoal] = useState(""); const [log, setLog] = useState<string[]>([]); const [busy, setBusy] = useState(false);
   const [usage, setUsage] = useState<any>({}); const [limits, setLimits] = useState<any>({}); const [models, setModels] = useState<any[]>([]);
-  const [q, setQ] = useState(""); const [mem, setMem] = useState("");
+  const [q, setQ] = useState(""); const [mem, setMem] = useState(""); const [modelsErr, setModelsErr] = useState("");
 
   useEffect(() => { localStorage.setItem("cwd", cwd); }, [cwd]);
   useEffect(() => {
@@ -44,7 +49,9 @@ function App() {
     const c = ork("run", { cwd, input: goal });
     c.stdout.on("data", l => setLog(x => [...x, l])); c.stderr.on("data", l => !/ExperimentalWarning|trace-warnings/.test(l) && setLog(x => [...x, l]));
     c.on("close", async () => { setBusy(false); setUsage(await json("usage", cwd)); });
-    await c.spawn();
+    c.on("error", e => setLog(x => [...x, `HATA: ${e}`]));
+    // spawn reddedilirse (CLI yok / izin yok) "close" hiç gelmez; düğme "Çalışıyor…" durumunda takılı kalıyordu.
+    try { await c.spawn(); } catch (e) { setLog([`${NOT_FOUND}\n${e}`]); setBusy(false); }
   };
 
   const totals = useMemo(() => {
@@ -72,18 +79,21 @@ function App() {
       </tbody></table>
     </section>}
     {tab === "limits" && <section>
-      {Object.keys(limits).length === 0 && <p>Henüz limit verisi yok. Claude için statusline betiğini kurun; Codex oturum dosyalarından otomatik okunur.</p>}
+      {limits.hata && <pre className="log">{String(limits.hata)}</pre>}
+      {!limits.hata && Object.keys(limits).length === 0 && <p>Henüz limit verisi yok. Claude için statusline betiğini kurun; Codex oturum dosyalarından otomatik okunur.</p>}
       {Object.entries<any>(limits).filter(([k]) => k !== "hata").map(([agent, ws]) => <div key={agent} className="limit"><h3>{agent}</h3>
         {(ws as any[]).map((w, i) => <div key={i}><div className="bar"><div style={{ width: `${Math.min(100, w.usedPct)}%` }} /></div>
           <small>%{Math.round(w.usedPct)} · sıfırlanma {new Date(w.resetsAt * 1000).toLocaleString()}</small></div>)}</div>)}
     </section>}
     {tab === "memory" && <section>
       <input value={q} onChange={e => setQ(e.target.value)} placeholder="Hafızada ara" />
-      <button disabled={!cwd} onClick={async () => setMem((await ork("recall", { cwd, input: q }).execute()).stdout)}>Getir</button>
+      <button disabled={!cwd} onClick={async () => { try { const r = await ork("recall", { cwd, input: q }).execute(); setMem(r.stdout || r.stderr); } catch (e) { setMem(`${NOT_FOUND}\n${e}`); } }}>Getir</button>
       <pre className="log">{mem}</pre>
     </section>}
     {tab === "models" && <section>
-      <button onClick={async () => setModels(await json("models"))}>Modelleri keşfet (opencode + OpenRouter)</button>
+      {/* Hata durumunda json() nesne döndürür; önceden doğrudan setModels'e gidip models.slice çağrısı arayüzü çökertiyordu. */}
+      <button onClick={async () => { const m = await json("models"); setModels(Array.isArray(m) ? m : []); setModelsErr(Array.isArray(m) ? "" : String(m?.hata ?? "")); }}>Modelleri keşfet (opencode + OpenRouter)</button>
+      {modelsErr && <pre className="log">{modelsErr}</pre>}
       <table><thead><tr><th>Sağlayıcı</th><th>Model</th><th>Ücretsiz</th></tr></thead><tbody>
         {models.slice(0, 300).map(m => <tr key={m.provider + m.id}><td>{m.provider}</td><td>{m.id}</td><td>{m.free ? "✓" : ""}</td></tr>)}</tbody></table>
     </section>}

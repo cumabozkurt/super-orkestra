@@ -21,8 +21,10 @@ export type Transport = "auto" | "acp" | "cli";
  * 2026-10-07'de opencode 1.18.35 ile ACP yeni oturum + loadSession devamı gerçek modelle doğrulandı.)
  * Claude Code / Codex için ACP npx adaptörü gerektirdiğinden varsayılan "cli".
  */
-export function makeWorker(c: WorkerConfig & { transport?: Transport }): Worker {
-  if (c.agent === "openrouter") return new OpenRouterWorker(c);
+export function makeWorker(c: WorkerConfig & { transport?: Transport }, providers: Record<string, any> = {}): Worker {
+  // API anahtarı yapılandırmaya yazılmaz; `providers.openrouter.apiKeyEnv` ile adı verilen ortam değişkeninden okunur
+  // (önceden bu alan belgelenmiş ama yok sayılıyordu, her zaman OPENROUTER_API_KEY okunuyordu).
+  if (c.agent === "openrouter") return new OpenRouterWorker(c, process.env[providers.openrouter?.apiKeyEnv || "OPENROUTER_API_KEY"] ?? "");
   const t: Transport = c.transport ?? (process.env.ORKESTRA_TRANSPORT as Transport | undefined) ?? (["opencode", "gemini"].includes(c.agent) ? "auto" : "cli");
   if (c.agent === "acp" || t === "acp") return new AcpWorker(c);
   if (t === "auto") return new AutoWorker(c);

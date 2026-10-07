@@ -1,16 +1,26 @@
-name: Özellik önerisi
-description: Yeni bir ajan, sağlayıcı ya da özellik öner
+name: Feature request / Özellik önerisi
+description: Suggest a new agent, provider or feature / Yeni bir ajan, sağlayıcı ya da özellik öner
 labels: [enhancement]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: "Hangi sorunu çözüyor?"
+      label: "What problem does it solve? / Hangi sorunu çözüyor?"
     validations:
       required: true
   - type: textarea
     id: idea
     attributes:
-      label: "Önerin"
+      label: "Your proposal / Önerin"
     validations:
       required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives considered / Düşünülen alternatifler"
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: "Contribution / Katkı"
+      options:
+        - label: "I would like to implement this myself / Bunu kendim geliştirmek isterim"

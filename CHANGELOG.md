@@ -2,6 +2,30 @@
 
 Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [SemVer](https://semver.org/lang/tr/).
 
+## [Unreleased]
+
+### Düzeltildi
+- **Node sürümü:** `engines` alanı `>=22.13` yerine `>=22.16`. Node 22.13–22.15'in yerleşik SQLite'ında FTS5 yok, bu sürümlerde hafıza katmanı `no such module: fts5` ile çöküyordu. Artık net bir hata mesajı veriliyor.
+- **ACP işçisi süreci çökertiyordu:** ajan ikilisi yoksa ya da başlatılamıyorsa (`opencode`/`gemini` için varsayılan taşıma `auto` = önce ACP) dinlenmeyen `error` olayı tüm CLI'ı düşürüyordu. Artık başarısız sonuç dönüyor ve CLI taşımasına geçiliyor.
+- **ACP dosya kum havuzu:** yol denetimi sembolik bağlantıları da çözüyor. Worktree içindeki bir bağlantı (ör. paylaşılan `node_modules` ya da repoya işlenmiş `x -> /etc`) üzerinden dışarı okuma/yazma engellendi.
+- **`reassign` tek işçide görevi duraklatıyordu:** başka müsait işçi yokken şefin "başkasına ver" kararı "hepsi limitte" sanılıp görev 1 saatliğine duraklatılıyordu. Artık aynı işçiyle düzeltmeye dönülüyor.
+- **Devam kuyruğu işi sessizce kaybedebiliyordu:** kilit doluyken 50 deneme beklemeden art arda yapılıyordu. Artık kısa aralıklarla ~2 sn bekleniyor, yine alınamazsa hata veriliyor.
+- **`ORKESTRA_TICK_MS` etkisizdi:** `schedule()` zamanlayıcıyı varsayılan 30 sn ile kurduğundan `run` komutunun istediği aralık uygulanmıyordu.
+- **Geçersiz git dal adı izolasyonu kapatıyordu:** şeften gelen `t1..2` gibi kimlikler `git worktree add`'i düşürüyor ve işçi ana çalışma ağacında koşuyordu. Kimlikler artık geçerli dal adına çevriliyor (`refSafe`).
+- **`providers.openrouter.apiKeyEnv` yok sayılıyordu:** belgelenmiş olmasına rağmen her zaman `OPENROUTER_API_KEY` okunuyordu.
+- **Yapılandırma doğrulaması:** şef olarak desteklenmeyen `openrouter`/`acp` ve geçersiz `transport` değerleri artık yüklemede reddediliyor (önceden ilk çağrıda belirsiz bir hatayla düşüyordu).
+- **OpenRouter istekleri zaman aşımsızdı:** `/models` için 30 sn, sohbet isteği için `ORKESTRA_TASK_TIMEOUT_MS` süre sınırı eklendi. Ağ hataları artık başarısız sonuç olarak dönüyor.
+- **Test kurcalama koruması:** alt klasördeki `test_*.py` ve `.test.mjs/.cjs` dosyaları da tanınıyor.
+- **Masaüstü:** CLI kurulu değilse "Çalışıyor…" düğmesi takılı kalıyordu ve Modeller sekmesi hata nesnesinde çöküyordu (`models.slice`). Artık kurulum ipucu gösteriliyor.
+- **VS Code:** boşluk içeren `orkestra.command` yolu Windows'ta bölünüyordu. Süreç başlamadığında stdin `EPIPE` hatası yakalanmıyordu.
+- **CLI:** `usage` kayıt yokken de aynı biçimi döndürüyor. `map --tokens` doğrulanıyor. `resume-daemon` başka projelerin şeflerini önbelleğe alıyor.
+- Windows CI'da çalışmayacak `printf` kullanan test düzeltildi. Testlerdeki tip hataları giderildi.
+
+### Eklendi
+- 10 yeni regresyon testi (toplam 75). `npm run typecheck` (tüm paketler + testler), `npm run check` ve `npm run smoke` betikleri.
+- CI: tip denetimi adımı ve masaüstü için `cargo check` işi.
+- İngilizce `README.md` (+ `README.tr.md`), `docs/` altında ayrıntılı belgeler (başlangıç, yapılandırma, mimari, CLI, MCP, VS Code, masaüstü, SSS), `CODE_OF_CONDUCT.md`, masaüstü paketi README'si. Araştırma raporları `docs/research/` altına taşındı.
+
 ## [1.0.0] — 2026-10-07
 İlk kararlı sürüm. Proje adı **Orkestra → Super Orkestra** oldu.
 

@@ -16,7 +16,12 @@ export class Memory {
     for (const f of ["project.md", "decisions.md", "progress.md", "conventions.md"])
       if (!existsSync(join(dir, f))) writeFileSync(join(dir, f), `# ${f.replace(".md", "")}\n`);
     this.db = new DatabaseSync(join(dir, "facts.db"));
-    this.db.exec(`CREATE VIRTUAL TABLE IF NOT EXISTS facts USING fts5(text, tags, ts UNINDEXED)`);
+    try { this.db.exec(`CREATE VIRTUAL TABLE IF NOT EXISTS facts USING fts5(text, tags, ts UNINDEXED)`); }
+    catch (e: any) {
+      // Node 22.13–22.15'in yerleşik SQLite'ı FTS5 olmadan derlenmiştir (FTS5, Node 22.16.0 ile geldi).
+      if (/fts5/i.test(String(e?.message))) throw new Error(`Bu Node.js sürümünün (${process.version}) yerleşik SQLite'ında FTS5 yok. Super Orkestra için Node.js ≥ 22.16 gerekir.`);
+      throw e;
+    }
   }
   remember(text: string, tags: string[] = []) {
     // Yinelenen olguyu güncelle (mem0'ın UPDATE adımının ucuz karşılığı)

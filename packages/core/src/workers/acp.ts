@@ -4,11 +4,26 @@
  */
 import { spawn } from "node:child_process";
 import { Readable, Writable } from "node:stream";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, realpath } from "node:fs/promises";
 import { resolve, relative, isAbsolute, dirname } from "node:path";
 
 /** ACP ajanının dosya isteklerini çalışma dizinine (worktree) hapseder: ana repoya veya ev dizinine yazamasın. */
 export function insideRoot(root: string, p: string) { const r = relative(resolve(root), resolve(root, p)); return r === "" || (!r.startsWith("..") && !isAbsolute(r)); }
+
+/**
+ * insideRoot + sembolik bağlantı çözümü. Yalnızca metinsel kontrol, worktree içindeki bir bağlantı üzerinden dışarı
+ * erişime izin veriyordu (ör. ana repoya bağlanan paylaşılan `node_modules`, ya da repoya işlenmiş `x -> /etc`).
+ * Hedefin (yoksa var olan en yakın atasının) gerçek yolu, kökün gerçek yolu altında olmalıdır.
+ */
+export async function insideRootReal(root: string, p: string): Promise<boolean> {
+  if (!insideRoot(root, p)) return false;
+  const realRoot = await realpath(root).catch(() => resolve(root));
+  let cur = resolve(root, p);
+  for (;;) {
+    try { return insideRoot(realRoot, await realpath(cur)); }
+    catch { const up = dirname(cur); if (up === cur) return false; cur = up; }
+  }
+}
 import * as acp from "@agentclientprotocol/sdk";
 import type { TaskBrief, Worker, WorkerConfig, WorkResult } from "../types.js";
 import { briefToPrompt, agentEnv, resolveSpawn } from "./cli-stream.js";
@@ -31,7 +46,9 @@ export class AcpWorker implements Worker {
     const proc = spawn(exe, argv, { cwd: opts.cwd, stdio: ["pipe", "pipe", "pipe"], windowsHide: true, env: agentEnv() });
     const killer = setTimeout(() => proc.kill(), Number(process.env.ORKESTRA_TASK_TIMEOUT_MS ?? 20 * 60_000)); // takılan ajan sonsuza dek beklemesin
     let stderr = ""; proc.stderr.on("data", d => (stderr += d));
-    opts.signal?.addEventListener("abort", () => proc.kill());
+    // Ajan ikilisi yoksa/çalıştırılamazsa 'error' olayı dinleyicisiz kalıp tüm süreci çökertiyordu.
+    proc.on("error", e => (stderr += `\n[spawn error] ${e.message}`)); proc.stdin.on("error", () => {});
+    const onAbort = () => proc.kill(); opts.signal?.addEventListener("abort", onAbort, { once: true });
     let text = "";
     const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
     const stream = acp.ndJsonStream(Writable.toWeb(proc.stdin) as WritableStream<Uint8Array>, Readable.toWeb(proc.stdout) as ReadableStream<Uint8Array>);
@@ -48,12 +65,12 @@ export class AcpWorker implements Worker {
         return { outcome: { outcome: "selected", optionId: allow.optionId } };
       },
       async readTextFile(p: any) {
-        if (!insideRoot(opts.cwd, p.path)) throw new Error(`çalışma dizini dışı okuma reddedildi: ${p.path}`);
+        if (!(await insideRootReal(opts.cwd, p.path))) throw new Error(`çalışma dizini dışı okuma reddedildi: ${p.path}`);
         let c = await readFile(resolve(opts.cwd, p.path), "utf8");
         if (p.line || p.limit) { const ls = c.split("\n"); const s = Math.max(0, (p.line ?? 1) - 1); c = ls.slice(s, p.limit ? s + p.limit : undefined).join("\n"); }
         return { content: c }; },
       async writeTextFile(p: any) {
-        if (!insideRoot(opts.cwd, p.path)) throw new Error(`çalışma dizini dışı yazma reddedildi: ${p.path}`);
+        if (!(await insideRootReal(opts.cwd, p.path))) throw new Error(`çalışma dizini dışı yazma reddedildi: ${p.path}`);
         const f = resolve(opts.cwd, p.path); await mkdir(dirname(f), { recursive: true }); await writeFile(f, p.content); return {}; },
     }), stream);
     try {
@@ -75,7 +92,7 @@ export class AcpWorker implements Worker {
     } catch (e: any) {
       const msg = `${e?.message ?? e}\n${stderr}`;
       return { taskId: brief.id, workerId: this.config.id, ok: false, summary: msg.slice(-1500), usage, limitHit: detectLimit(msg, this.acpAgent) };
-    } finally { clearTimeout(killer); proc.kill(); }
+    } finally { clearTimeout(killer); opts.signal?.removeEventListener("abort", onAbort); proc.kill(); }
   }
 
   /** Model seçimi ACP session config option üzerinden (category "model" veya id "model"). */

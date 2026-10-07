@@ -1,6 +1,7 @@
 import type { Planner, Review } from "./conductor.js";
 import type { Config, TaskBrief, WorkResult } from "../types.js";
 import { runCli } from "../workers/cli-stream.js";
+import { refSafe } from "../workers/worktree.js";
 
 /**
  * Şef modeli headless ve ARAÇSIZ çağırır: tek tur, katı JSON çıktı -> minimum çıktı token'ı.
@@ -49,7 +50,7 @@ ${repoMap || "(boş)"}`;
     if (!list.length) list.push({ goal, files: [], acceptance: [], complexity: "small", tags: [] }); // boş plan: hedefin kendisi tek görev
     const seen = new Set<string>(); const C = ["trivial", "small", "medium", "hard"];
     return list.map((t, i) => {
-      let id = String(t.id || `t${i + 1}`).replace(/[^\w.-]/g, "-"); while (seen.has(id)) id = `${id}-${i + 1}`; seen.add(id);
+      let id = refSafe(String(t.id || `t${i + 1}`)); while (seen.has(id)) id = `${id}-${i + 1}`; seen.add(id);
       return { id, goal: t.goal, files: Array.isArray(t.files) ? t.files : [], context: typeof t.context === "string" ? t.context : "",
         acceptance: Array.isArray(t.acceptance) ? t.acceptance : [], complexity: C.includes(t.complexity) ? t.complexity : "small",
         tags: Array.isArray(t.tags) ? t.tags : [] };

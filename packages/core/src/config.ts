@@ -3,6 +3,9 @@ import { join } from "node:path";
 import type { AgentKind, Config } from "./types.js";
 
 const AGENTS: AgentKind[] = ["claude-code", "codex", "gemini", "opencode", "openrouter", "acp"];
+/** Şef headless CLI ile çağrılır (LlmPlanner -> runCli); openrouter/acp şef olarak desteklenmez. */
+export const CONDUCTOR_AGENTS: AgentKind[] = ["claude-code", "codex", "gemini", "opencode"];
+const TRANSPORTS = ["auto", "acp", "cli"];
 
 /** Yapılandırma dosyası yoksa ya da eksikse kullanılan varsayılanlar (önceden npm ile kurulunca örnek dosya bulunamıyor ve çöküyordu). */
 export const DEFAULT_CONFIG: Config = {
@@ -31,13 +34,15 @@ export function detectGates(cwd: string): string[] {
 
 export function validateConfig(c: Config): string[] {
   const e: string[] = [];
-  if (!AGENTS.includes(c.conductor?.agent)) e.push(`conductor.agent geçersiz: ${c.conductor?.agent}`);
+  if (!CONDUCTOR_AGENTS.includes(c.conductor?.agent)) e.push(`conductor.agent geçersiz: ${c.conductor?.agent}; şef için geçerliler: ${CONDUCTOR_AGENTS.join(", ")}`);
   if (!Array.isArray(c.workers) || !c.workers.length) e.push("en az bir işçi gerekli (workers)");
   const ids = new Set<string>();
   for (const w of Array.isArray(c.workers) ? c.workers : []) {
     if (!w.id) e.push("her işçinin id'si olmalı");
     else if (ids.has(w.id)) e.push(`yinelenen işçi id'si: ${w.id}`); else ids.add(w.id);
     if (!AGENTS.includes(w.agent)) e.push(`${w.id}: agent geçersiz (${w.agent}); geçerliler: ${AGENTS.join(", ")}`);
+    const tr = (w as { transport?: unknown }).transport;
+    if (tr !== undefined && !TRANSPORTS.includes(String(tr))) e.push(`${w.id}: transport geçersiz (${tr}); geçerliler: ${TRANSPORTS.join(", ")}`);
     if (!Array.isArray(w.strengths)) w.strengths = [];
     w.model ??= "";
   }

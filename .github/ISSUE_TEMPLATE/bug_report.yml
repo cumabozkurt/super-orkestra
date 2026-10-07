@@ -1,18 +1,23 @@
-name: Hata bildirimi
-description: Bir şey beklendiği gibi çalışmıyor
+name: Bug report / Hata bildirimi
+description: Something does not work as expected / Bir şey beklendiği gibi çalışmıyor
 labels: [bug]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please search existing issues first. **Security problems:** do not open a public issue, see SECURITY.md.
+        Bildirdiğin için teşekkürler! Önce mevcut issue'lara göz at. **Güvenlik açıkları** için herkese açık issue açma, SECURITY.md'ye bak.
   - type: textarea
     id: what
     attributes:
-      label: "Ne oldu?"
-      description: "Beklenen ve gerçekleşen davranış"
+      label: "What happened? / Ne oldu?"
+      description: "Expected vs. actual behaviour / Beklenen ve gerçekleşen davranış"
     validations:
       required: true
   - type: textarea
     id: repro
     attributes:
-      label: "Yeniden üretme adımları"
+      label: "Steps to reproduce / Yeniden üretme adımları"
       placeholder: |
         1. super-orkestra run "..."
         2. ...
@@ -21,22 +26,42 @@ body:
   - type: input
     id: version
     attributes:
-      label: "Sürüm"
+      label: "Super Orkestra version / Sürüm"
       placeholder: "super-orkestra --version"
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: "Node.js version"
+      placeholder: "node --version (≥ 22.16 required)"
     validations:
       required: true
   - type: dropdown
     id: os
     attributes:
-      label: "İşletim sistemi"
+      label: "Operating system / İşletim sistemi"
       options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: "Where / Nerede"
+      multiple: true
+      options: [CLI, MCP server, VS Code extension, Desktop app, Core library]
+  - type: input
+    id: agents
+    attributes:
+      label: "Agent CLIs and versions / Ajan CLI'ları ve sürümleri"
+      placeholder: "claude 2.x, codex 0.x, gemini 0.x, opencode 1.x"
   - type: textarea
     id: config
     attributes:
-      label: "orkestra.config.json (API anahtarlarını silin)"
+      label: "orkestra.config.json (remove API keys / API anahtarlarını silin)"
       render: json
   - type: textarea
     id: logs
     attributes:
-      label: "İlgili çıktı / .orkestra/usage.jsonl satırları"
+      label: "Relevant output / .orkestra/usage.jsonl lines — İlgili çıktı"
       render: shell

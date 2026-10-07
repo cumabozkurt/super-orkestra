@@ -7,7 +7,7 @@ import type { LimitTracker } from "../limits/tracker.js";
 
 /**
  * Orkestra'yı MCP sunucusu olarak açar -> Claude Code, Codex, Gemini, opencode, Cline, Continue, Kilo, Copilot
- * hepsi eklentisiz kullanabilir:  claude mcp add super-orkestra -- npx -y super-orkestra mcp
+ * hepsi eklentisiz kullanabilir:  claude mcp add super-orkestra -- super-orkestra mcp
  */
 export async function startMcp(c: Conductor, mem: Memory, limits: LimitTracker, repoMap: (focus?: string) => string | Promise<string>, version = "0.0.0") {
   const s = new McpServer({ name: "super-orkestra", version });
