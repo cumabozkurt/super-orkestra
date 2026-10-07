@@ -88,7 +88,7 @@ jobs:
         run: npm run package:vscode && cp packages/vscode/*.vsix release-assets/
       - name: Kurulum denemesi (tarball'lardan genel kurulum)
         run: |
-          npm i -g --prefix "$RUNNER_TEMP/g" release-assets/super-orkestra-core-*.tgz release-assets/super-orkestra-[0-9]*.tgz
+          npm i -g --prefix "$RUNNER_TEMP/g" ./release-assets/super-orkestra-core-*.tgz ./release-assets/super-orkestra-[0-9]*.tgz
           "$RUNNER_TEMP/g/bin/super-orkestra" --version
           ls -l release-assets
       - name: npm yayını (yalnızca NPM_TOKEN varsa)
