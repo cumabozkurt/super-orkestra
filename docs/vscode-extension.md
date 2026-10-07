@@ -63,4 +63,4 @@ Open the repository in VS Code and launch an **Extension Development Host** with
 
 ## Publishing (maintainers)
 
-`release.yml` builds the `.vsix` on every `v*` tag. It publishes to the Marketplace if the `VSCE_PAT` secret is set, and to Open VSX if `OVSX_PAT` is set. The extension ID is `super-orkestra.super-orkestra-vscode`, so the `super-orkestra` publisher must exist and belong to you before the first publish.
+`release.yml` builds the `.vsix` on every `v*` tag. It publishes to the Marketplace if the `VSCE_PAT` secret is set, and to Open VSX if `OVSX_PAT` is set. The extension ID is `cumabozkurt.super-orkestra-vscode`; it is published under the `cumabozkurt` publisher (Marketplace) and namespace (Open VSX).

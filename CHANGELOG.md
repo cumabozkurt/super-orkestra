@@ -4,6 +4,9 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 
 ## [Unreleased]
 
+### Değişti
+- VS Code eklentisinin yayıncısı `cumabozkurt` oldu; eklenti kimliği artık `cumabozkurt.super-orkestra-vscode` (Marketplace ve Open VSX).
+
 ## [1.0.0] — 2026-10-08
 İlk kararlı sürüm. Proje adı **Orkestra → Super Orkestra** oldu. İlk GitHub sürümü: [v1.0.0](https://github.com/cumabozkurt/super-orkestra/releases/tag/v1.0.0).
 
