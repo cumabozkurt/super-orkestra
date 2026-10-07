@@ -53,7 +53,7 @@ jobs:
 
           ---
 
-          **Kurulum / Install:** see the README (*Install*): desktop installers, the VS Code `.vsix` and the CLI tarballs are attached below. `SHA256SUMS.txt` lists the checksum of every file.
+          **Install / Kurulum:** the desktop installers, the VS Code `.vsix` and the CLI tarballs are attached below. How to install each one: [README → Downloads](https://github.com/cumabozkurt/super-orkestra#downloads-v100) · [Türkçe](https://github.com/cumabozkurt/super-orkestra/blob/main/README.tr.md#i̇ndirmeler-v100). `SHA256SUMS.txt` lists the checksum of every file.
           MD
           cat notes.md
       - name: Taslak GitHub Release
@@ -64,9 +64,9 @@ jobs:
           find_id() { gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name == \"$TAG\") | .id" | head -n1; }
           id=$(find_id)
           if [ -z "$id" ]; then
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
-              --title "Super Orkestra $TAG" --notes-file notes.md
-            id=$(find_id)
+            # the id comes straight from the create call: a fresh draft can take a moment to show up in the list
+            id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="Super Orkestra $TAG" \
+              -F body=@notes.md -F draft=true -F prerelease=false --jq '.id')
           fi
           test -n "$id"
           echo "id=$id" >> "$GITHUB_OUTPUT"
