@@ -38,7 +38,7 @@ describe("devam zamanlayıcısı", () => {
     mkdirSync(lock);
     expect(() => s.schedule({ brief: { ...brief, id: "t2" }, workerId: "w1", at: 1 })).toThrow(/kilitli/);
     s.stop();
-  }, 10_000);
+  });
 });
 
 describe("şef: reassign", () => {

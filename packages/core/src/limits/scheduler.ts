@@ -29,7 +29,9 @@ export class ResumeScheduler {
    */
   schedule(job: ResumeJob) {
     let ok = false;
-    for (let i = 0; i < 100 && !ok; i++) { ok = !!this.locked(() => { this.save([...this.load(), job]); return true; }); if (!ok) sleepSync(20); }
+    // Süre sınırı saatle ölçülür (yüklü makinelerde uyku uzayabildiği için deneme sayısıyla değil).
+    const deadline = Date.now() + 2_000;
+    for (;;) { ok = !!this.locked(() => { this.save([...this.load(), job]); return true; }); if (ok || Date.now() >= deadline) break; sleepSync(20); }
     if (!ok) throw new Error(`devam kuyruğu kilitli, iş kaydedilemedi: ${this.file}.lock`);
     if (!this.timer) this.arm();
   }
