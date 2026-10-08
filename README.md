@@ -11,7 +11,7 @@
   <a href="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml"><img src="https://github.com/cumabozkurt/super-orkestra/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/cumabozkurt/super-orkestra/releases/latest"><img src="https://img.shields.io/github/v/release/cumabozkurt/super-orkestra?sort=semver" alt="Latest release"></a>
   <a href="https://www.npmjs.com/package/super-orkestra"><img src="https://img.shields.io/npm/v/super-orkestra?logo=npm" alt="npm"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode"><img src="https://img.shields.io/visual-studio-marketplace/v/cumabozkurt.super-orkestra-vscode?label=VS%20Marketplace&logo=visualstudiocode" alt="VS Code Marketplace"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=cumabozkurt.super-orkestra-vscode"><img src="https://img.shields.io/badge/VS%20Marketplace-install-007ACC" alt="VS Code Marketplace"></a>
   <a href="https://open-vsx.org/extension/cumabozkurt/super-orkestra-vscode"><img src="https://img.shields.io/open-vsx/v/cumabozkurt/super-orkestra-vscode?label=Open%20VSX" alt="Open VSX"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A5%2022.16-339933?logo=node.js&logoColor=white" alt="Node.js ≥ 22.16">
